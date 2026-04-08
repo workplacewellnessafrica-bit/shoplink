@@ -39,6 +39,8 @@ import {
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { Link } from "wouter";
+import IconImagePicker from "@/components/IconImagePicker";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
 
 // ─── Image Upload Helper ───────────────────────────────────────────────────────
 function fileToBase64(file: File): Promise<string> {
@@ -233,11 +235,10 @@ function StoreProfileEditor({ business }: { business: any }) {
     onError: (e) => toast.error(e.message),
   });
 
-  const handleImageChange = (type: "logo" | "cover") => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload = async (file: File, type: "logo" | "cover") => {
     if (type === "logo") { setLogoFile(file); setLogoPreview(URL.createObjectURL(file)); }
     else { setCoverFile(file); setCoverPreview(URL.createObjectURL(file)); }
+    return URL.createObjectURL(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -257,40 +258,30 @@ function StoreProfileEditor({ business }: { business: any }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Cover Image</Label>
-        <div
-          onClick={() => coverRef.current?.click()}
-          className="relative h-40 rounded-xl border-2 border-dashed border-border cursor-pointer overflow-hidden hover:border-primary/50 transition-colors bg-muted"
-        >
-          {coverPreview ? (
-            <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full">
-              <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">Upload cover image</p>
-            </div>
-          )}
-        </div>
-        <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange("cover")} />
-      </div>
+      <IconImagePicker
+        value={coverPreview || ""}
+        onChange={(val) => setCoverPreview(val)}
+        onImageUpload={(file) => handleImageUpload(file, "cover")}
+        label="Cover Image"
+        description="Upload a cover image for your store"
+        allowEmoji={false}
+        allowImageUpload={true}
+      />
 
-      <div className="flex items-start gap-4">
-        <div className="space-y-2">
+      <div className="grid grid-cols-3 gap-4">
+        <div className="space-y-3">
           <Label className="text-sm font-medium">Logo</Label>
-          <div
-            onClick={() => logoRef.current?.click()}
-            className="w-20 h-20 rounded-xl border-2 border-dashed border-border cursor-pointer overflow-hidden hover:border-primary/50 transition-colors bg-muted flex items-center justify-center"
-          >
-            {logoPreview ? (
-              <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
-            ) : (
-              <Upload className="h-6 w-6 text-muted-foreground" />
-            )}
-          </div>
-          <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange("logo")} />
+          <IconImagePicker
+            value={logoPreview || ""}
+            onChange={(val) => setLogoPreview(val)}
+            onImageUpload={(file) => handleImageUpload(file, "logo")}
+            label=""
+            description="Upload a logo or select an emoji"
+            allowEmoji={true}
+            allowImageUpload={true}
+          />
         </div>
-        <div className="flex-1 space-y-3">
+        <div className="space-y-3">
           <div className="space-y-1.5">
             <Label>Store Name *</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} required />
@@ -326,9 +317,28 @@ function StoreProfileEditor({ business }: { business: any }) {
 // ─── Main Admin Panel ─────────────────────────────────────────────────────────
 export default function AdminPanel() {
   const { user, loading, isAuthenticated } = useAuth();
+  const { hasAccess } = useRoleAccess("admin");
   const [productDialogOpen, setProductDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const utils = trpc.useUtils();
+
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600 mb-4">You don't have permission to access the admin panel.</p>
+            <Button asChild>
+              <Link href="/">Go to Home</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const { data: business, isLoading: bizLoading } = trpc.business.getMine.useQuery(undefined, {
     enabled: isAuthenticated,
