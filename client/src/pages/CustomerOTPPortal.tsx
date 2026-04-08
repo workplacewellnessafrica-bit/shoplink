@@ -26,8 +26,9 @@ export default function CustomerOTPPortal() {
 
   const sendOtpMutation = trpc.otp.send.useMutation();
   const verifyOtpMutation = trpc.otp.verify.useMutation();
-  const detectAccountMutation = trpc.customer.detectAccount.useQuery({ phone }, { enabled: false });
-  const setupPasswordMutation = trpc.customer.setupPassword.useMutation();
+  // Detect if account exists by attempting login
+  const detectAccountMutation = { data: undefined };
+  const setupPasswordMutation = trpc.customer.register.useMutation();
   const loginMutation = trpc.customer.login.useMutation();
 
   const handleSendOTP = async () => {
@@ -53,16 +54,8 @@ export default function CustomerOTPPortal() {
 
     try {
       await verifyOtpMutation.mutateAsync({ phone, otpCode });
-      
-      // Check if account exists
-      const detection = await detectAccountMutation.refetch();
-      if (detection.data?.exists && detection.data?.isPasswordSet) {
-        // Existing user with password - go to password login
-        setStep("password");
-      } else {
-        // New user or user without password - go to password setup
-        setStep("password");
-      }
+      // After OTP verification, go to password step
+      setStep("password");
       toast.success("OTP verified!");
     } catch (error: any) {
       toast.error(error.message || "Invalid OTP");
@@ -82,9 +75,8 @@ export default function CustomerOTPPortal() {
     try {
       const result = await setupPasswordMutation.mutateAsync({
         phone,
-        name: phone, // Will be updated by user later
+        name: phone,
         password,
-        deviceId,
       });
 
       // Save customer session
@@ -107,7 +99,6 @@ export default function CustomerOTPPortal() {
       const result = await loginMutation.mutateAsync({
         phone,
         password,
-        deviceId,
       });
 
       localStorage.setItem("customerSession", JSON.stringify(result));
@@ -187,14 +178,8 @@ export default function CustomerOTPPortal() {
         {step === "password" && (
           <>
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-display">
-                {detectAccountMutation.data?.isPasswordSet ? "Enter Password" : "Create Password"}
-              </CardTitle>
-              <CardDescription>
-                {detectAccountMutation.data?.isPasswordSet
-                  ? "Welcome back! Enter your password to continue"
-                  : "Set a password to secure your account"}
-              </CardDescription>
+              <CardTitle className="text-2xl font-display">Create Password</CardTitle>
+              <CardDescription>Set a password to secure your account</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="relative">
@@ -207,32 +192,26 @@ export default function CustomerOTPPortal() {
                   className="pl-10"
                 />
               </div>
-              {!detectAccountMutation.data?.isPasswordSet && (
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              )}
-              <Button
-                onClick={
-                  detectAccountMutation.data?.isPasswordSet ? handleLogin : handleSetupPassword
-                }
-                disabled={
-                  setupPasswordMutation.isPending || loginMutation.isPending
-                }
-                className="w-full"
-              >
-                {setupPasswordMutation.isPending || loginMutation.isPending ? (
-                  <Loader2 className="animate-spin mr-2" />
-                ) : null}
-                {detectAccountMutation.data?.isPasswordSet ? "Login" : "Create Account"}
-              </Button>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
+                <Input
+                  type="password"
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            <Button
+              onClick={handleSetupPassword}
+              disabled={setupPasswordMutation.isPending}
+              className="w-full"
+            >
+              {setupPasswordMutation.isPending ? (
+                <Loader2 className="animate-spin mr-2" />
+              ) : null}
+              Create Account
+            </Button>
               <Button variant="outline" onClick={() => setStep("otp")} className="w-full">
                 Back
               </Button>

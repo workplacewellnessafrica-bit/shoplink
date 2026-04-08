@@ -68,11 +68,11 @@
 - [x] Order tracking and details
 
 ### Business Admin Panel Refactor
-- [ ] Separate /store route for business owners
-- [ ] Feature selection during business signup (enable/disable POS)
-- [ ] Multi-role support: owner, attendant, accountant
-- [ ] Role-based dashboard (owner sees all, attendant sees sales, accountant sees reconciliation)
-- [ ] Attendant management (add/remove/edit)
+- [x] Separate /store route for business owners
+- [x] Feature selection during business signup (enable/disable POS)
+- [x] Multi-role support: owner, attendant, accountant
+- [x] Role-based dashboard (owner sees all, attendant sees sales, accountant sees reconciliation)
+- [x] Attendant management (add/remove/edit)
 
 ### POS System
 - [x] Product search by product code
@@ -107,6 +107,6 @@
 
 ### Testing & Deployment
 - [x] Unit tests for OTP, POS, reconciliation routers (31 tests passing)
-- [ ] Integration tests for multi-role access control
-- [ ] E2E tests for POS checkout flow
-- [ ] Barcode generation and scanning tests
+- [x] Integration tests for multi-role access control
+- [x] E2E tests for POS checkout flow
+- [x] Barcode generation and scanning tests

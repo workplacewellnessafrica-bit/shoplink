@@ -448,6 +448,9 @@ const customerRouter = router({
       if (!customer)
         throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid phone or password" });
 
+      if (!customer.passwordHash)
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid phone or password" });
+
       const valid = await bcrypt.compare(input.password, customer.passwordHash);
       if (!valid)
         throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid phone or password" });

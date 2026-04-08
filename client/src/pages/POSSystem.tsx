@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Search, BarCode3, Trash2, ShoppingCart, Plus, Minus } from "lucide-react";
+import { Loader2, Search, Barcode, Trash2, ShoppingCart, Plus, Minus } from "lucide-react";
 
 interface CartItem {
   productId: number;
@@ -23,7 +23,7 @@ export default function POSSystem() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const searchProductMutation = trpc.pos.searchByCode.useMutation();
-  const getPopularMutation = trpc.pos.getPopular.useQuery({ businessId });
+  const { data: popularItems, isLoading: isLoadingPopular } = trpc.pos.getPopular.useQuery({ businessId });
   const checkoutMutation = trpc.pos.checkout.useMutation();
 
   useEffect(() => {
@@ -43,9 +43,11 @@ export default function POSSystem() {
         productCode: searchCode,
       });
 
-      addToCart(product);
-      setSearchCode("");
-      searchInputRef.current?.focus();
+      if (product) {
+        addToCart(product);
+        setSearchCode("");
+        searchInputRef.current?.focus();
+      }
     } catch (error: any) {
       toast.error("Product not found");
     }
@@ -57,7 +59,9 @@ export default function POSSystem() {
         businessId,
         productCode: barcode,
       });
-      addToCart(product);
+      if (product) {
+        addToCart(product);
+      }
     } catch {
       toast.error("Barcode not found");
     }
@@ -189,13 +193,13 @@ export default function POSSystem() {
               <CardDescription>Quick add frequently sold products</CardDescription>
             </CardHeader>
             <CardContent>
-              {getPopularMutation.isLoading ? (
+              {isLoadingPopular ? (
                 <div className="flex justify-center py-8">
                   <Loader2 className="animate-spin" />
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {getPopularMutation.data?.map((product: any) => (
+                  {popularItems?.map((product: any) => (
                     <Button
                       key={product.id}
                       variant="outline"
