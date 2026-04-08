@@ -17,6 +17,7 @@ import StoreOnboarding from "./pages/StoreOnboarding";
 import POSDownload from "./pages/POSDownload";
 import Tools from "./pages/Tools";
 import MobilePOS from "./pages/MobilePOS";
+import DesktopPOS from "./pages/DesktopPOS";
 
 function Router() {
   return (
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/pos-download" component={POSDownload} />
       <Route path="/tools" component={Tools} />
       <Route path="/mobile-pos" component={MobilePOS} />
+      <Route path="/desktop-pos" component={DesktopPOS} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
