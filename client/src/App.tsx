@@ -9,6 +9,9 @@ import AdminPanel from "./pages/AdminPanel";
 import Storefront from "./pages/Storefront";
 import CustomerPortal from "./pages/CustomerPortal";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import CustomerOTPPortal from "./pages/CustomerOTPPortal";
+import POSSystem from "./pages/POSSystem";
+import DayEndReconciliation from "./pages/DayEndReconciliation";
 
 function Router() {
   return (
@@ -18,6 +21,10 @@ function Router() {
       <Route path="/store/:slug" component={Storefront} />
       <Route path="/orders" component={CustomerPortal} />
       <Route path="/order/confirmation" component={OrderConfirmation} />
+      <Route path="/customer/login" component={CustomerOTPPortal} />
+      <Route path="/customer/orders" component={CustomerPortal} />
+      <Route path="/pos" component={POSSystem} />
+      <Route path="/reconciliation" component={DayEndReconciliation} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -61,11 +61,11 @@
 - [x] device_sessions table (id, customerId, deviceId, lastAccessedAt, createdAt) — persistent device login
 
 ### Customer Portal Enhancements
-- [ ] Separate /customer route (avoid collision with business flows)
-- [ ] OTP-based login: phone → OTP verification → password setup (first time) or login (returning)
-- [ ] Persistent device login (like Jumia) using device fingerprint
-- [ ] Order history with status timeline
-- [ ] Order tracking and details
+- [x] Separate /customer route (avoid collision with business flows)
+- [x] OTP-based login: phone → OTP verification → password setup (first time) or login (returning)
+- [x] Persistent device login (like Jumia) using device fingerprint
+- [x] Order history with status timeline
+- [x] Order tracking and details
 
 ### Business Admin Panel Refactor
 - [ ] Separate /store route for business owners
@@ -75,28 +75,28 @@
 - [ ] Attendant management (add/remove/edit)
 
 ### POS System
-- [ ] Product search by product code
-- [ ] Popular items suggestion (based on sales history)
-- [ ] Emoji/image button interface for mobile
-- [ ] Calculator-like interface for quantity entry
-- [ ] Add items to cart, adjust quantities
-- [ ] Barcode generation for all products (Code128 format)
-- [ ] Barcode scanning (mobile-compatible using camera)
-- [ ] POS checkout: select payment method (cash, M-Pesa, card, credit)
-- [ ] Real-time sales logging and inventory deduction
-- [ ] Multi-attendant sales tracking (who made the sale)
+- [x] Product search by product code
+- [x] Popular items suggestion (based on sales history)
+- [x] Emoji/image button interface for mobile
+- [x] Calculator-like interface for quantity entry
+- [x] Add items to cart, adjust quantities
+- [x] Barcode generation for all products (Code128 format)
+- [x] Barcode scanning (mobile-compatible using camera)
+- [x] POS checkout: select payment method (cash, M-Pesa, card, credit)
+- [x] Real-time sales logging and inventory deduction
+- [x] Multi-attendant sales tracking (who made the sale)
 
 ### Day-End Reconciliation
-- [ ] Daily sales summary by payment method
-- [ ] Cash at hand input
-- [ ] M-Pesa total tracking
-- [ ] Card payments total
-- [ ] Credits tracking
-- [ ] Expenditures input
-- [ ] Balance verification (opening + sales - expenditures = closing)
-- [ ] Reconciliation status (pending, verified, closed)
+- [x] Daily sales summary by payment method
+- [x] Cash at hand input
+- [x] M-Pesa total tracking
+- [x] Card payments total
+- [x] Credits tracking
+- [x] Expenditures input
+- [x] Balance verification (opening + sales - expenditures = closing)
+- [x] Reconciliation status (pending, verified, closed)
 - [ ] Excel export for accounting
-- [ ] Historical reconciliation records
+- [x] Historical reconciliation records
 
 ### OTP & Authentication
 - [x] OTP generation and sending via WhatsApp

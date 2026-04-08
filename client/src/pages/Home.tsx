@@ -29,12 +29,15 @@ export default function Home() {
           </Link>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/orders">My Orders</Link>
+              <Link href="/customer/login">My Orders</Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/pos">POS</Link>
             </Button>
             <Button size="sm" asChild>
               <Link href="/admin">
                 <Store className="h-3.5 w-3.5 mr-1.5" />
-                Open Your Store
+                My Store
               </Link>
             </Button>
           </div>
