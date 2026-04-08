@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 import {
   ShoppingCart,
   Plus,
@@ -22,6 +23,7 @@ import {
   Lock,
   ChevronDown,
   ChevronUp,
+  Scan,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -62,6 +64,7 @@ export default function DesktopPOS() {
   const [transactionLogs, setTransactionLogs] = useState<TransactionLog[]>([]);
   const [showPinInput, setShowPinInput] = useState(false);
   const [expandedTransaction, setExpandedTransaction] = useState<number | null>(null);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const { data: business } = trpc.business.getMine.useQuery();
   const { data: products } = trpc.product.listMine.useQuery(undefined, {
@@ -275,13 +278,23 @@ export default function DesktopPOS() {
                 <CardHeader>
                   <CardTitle>Search Products</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Input
-                    placeholder="Search by product name..."
-                    value={searchCode}
-                    onChange={(e) => setSearchCode(e.target.value)}
-                    className="w-full"
-                  />
+                <CardContent className="space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Search by product name..."
+                      value={searchCode}
+                      onChange={(e) => setSearchCode(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => setScannerOpen(true)}
+                      className="gap-2"
+                    >
+                      <Scan className="h-4 w-4" />
+                      Scan
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -638,6 +651,24 @@ export default function DesktopPOS() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Barcode Scanner */}
+      <BarcodeScanner
+        isOpen={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onScan={(barcode) => {
+          const product = products?.find(
+            (p) => (p as any).code === barcode || p.name.toLowerCase().includes(barcode.toLowerCase())
+          );
+          if (product) {
+            addToCart(product);
+            setScannerOpen(false);
+            toast.success(`Added ${product.name} to cart`);
+          } else {
+            toast.error(`Product not found: ${barcode}`);
+          }
+        }}
+      />
     </div>
   );
 }
