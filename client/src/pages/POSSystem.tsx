@@ -22,7 +22,8 @@ export default function POSSystem() {
   const barcodeInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const searchProductMutation = trpc.pos.searchByCode.useMutation();
+  const [searchParams, setSearchParams] = useState<{ businessId: number; productCode: string } | null>(null);
+  const searchProductQuery = trpc.pos.searchByCode.useQuery(searchParams!, { enabled: !!searchParams });
   const { data: popularItems, isLoading: isLoadingPopular } = trpc.pos.getPopular.useQuery({ businessId });
   const checkoutMutation = trpc.pos.checkout.useMutation();
 
@@ -31,40 +32,33 @@ export default function POSSystem() {
     barcodeInputRef.current?.focus();
   }, []);
 
-  const handleSearchProduct = async () => {
+  useEffect(() => {
+    if (searchProductQuery.data) {
+      addToCart(searchProductQuery.data);
+      setSearchCode("");
+      searchInputRef.current?.focus();
+      setSearchParams(null);
+    }
+  }, [searchProductQuery.data]);
+
+  useEffect(() => {
+    if (searchProductQuery.isError) {
+      toast.error("Product not found");
+      setSearchParams(null);
+    }
+  }, [searchProductQuery.isError]);
+
+  const handleSearchProduct = () => {
     if (!searchCode.trim()) {
       toast.error("Please enter a product code");
       return;
     }
 
-    try {
-      const product = await searchProductMutation.mutateAsync({
-        businessId,
-        productCode: searchCode,
-      });
-
-      if (product) {
-        addToCart(product);
-        setSearchCode("");
-        searchInputRef.current?.focus();
-      }
-    } catch (error: any) {
-      toast.error("Product not found");
-    }
+    setSearchParams({ businessId, productCode: searchCode });
   };
 
-  const handleBarcodeScanned = async (barcode: string) => {
-    try {
-      const product = await searchProductMutation.mutateAsync({
-        businessId,
-        productCode: barcode,
-      });
-      if (product) {
-        addToCart(product);
-      }
-    } catch {
-      toast.error("Barcode not found");
-    }
+  const handleBarcodeScanned = (barcode: string) => {
+    setSearchParams({ businessId, productCode: barcode });
   };
 
   const addToCart = (product: any) => {
@@ -160,7 +154,7 @@ export default function POSSystem() {
                   onChange={(e) => setSearchCode(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearchProduct()}
                 />
-                <Button onClick={handleSearchProduct} disabled={searchProductMutation.isPending}>
+                <Button onClick={handleSearchProduct}>
                   <Search size={16} />
                 </Button>
               </div>
@@ -245,10 +239,10 @@ export default function POSSystem() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => removeFromCart(item.productId)}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
+              onClick={() => removeFromCart(item.productId)}
+            >
+              <Trash2 size={14} />
+            </Button>
                       </div>
                       <div className="flex items-center justify-between">
                         <Button

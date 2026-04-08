@@ -95,7 +95,7 @@
 - [x] Expenditures input
 - [x] Balance verification (opening + sales - expenditures = closing)
 - [x] Reconciliation status (pending, verified, closed)
-- [ ] Excel export for accounting
+- [x] Excel export for accounting
 - [x] Historical reconciliation records
 
 ### OTP & Authentication

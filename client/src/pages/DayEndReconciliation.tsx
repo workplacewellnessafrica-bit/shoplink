@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, DollarSign, TrendingUp, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, DollarSign, TrendingUp, CheckCircle2, AlertCircle, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 
 export default function DayEndReconciliation() {
   const [cashAtHand, setCashAtHand] = useState("");
@@ -16,6 +17,7 @@ export default function DayEndReconciliation() {
   const [isVerified, setIsVerified] = useState(false);
 
   const getTodayQuery = trpc.reconciliation.getTodayOrCreate.useQuery();
+  const getHistoryQuery = trpc.reconciliation.getHistory.useQuery();
   const updateMutation = trpc.reconciliation.update.useMutation();
   const verifyMutation = trpc.reconciliation.verify.useMutation();
   const closeMutation = trpc.reconciliation.close.useMutation();
@@ -44,6 +46,32 @@ export default function DayEndReconciliation() {
     const expend = parseFloat(expenditures || "0");
     const opening = parseFloat(reconciliation?.openingBalance || "0");
     return (opening + parseFloat(daysSales) - expend).toFixed(2);
+  };
+
+  const handleExportToExcel = () => {
+    if (!getHistoryQuery.data || getHistoryQuery.data.length === 0) {
+      toast.error("No reconciliation records to export");
+      return;
+    }
+
+    const data = getHistoryQuery.data.map((rec: any) => ({
+      Date: rec.date,
+      "Opening Balance": rec.openingBalance,
+      "Days Sales": rec.daysSales,
+      Expenditures: rec.expenditures,
+      "Closing Balance": rec.closingBalance,
+      "Cash at Hand": rec.cashAtHand || 0,
+      "M-Pesa Total": rec.mpesaTotal || 0,
+      "Card Total": rec.cardTotal || 0,
+      Credits: rec.credits || 0,
+      Status: rec.status,
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Reconciliation");
+    XLSX.writeFile(wb, `reconciliation-${new Date().toISOString().split("T")[0]}.xlsx`);
+    toast.success("Reconciliation exported to Excel");
   };
 
   const handleSaveReconciliation = async () => {
@@ -119,12 +147,22 @@ export default function DayEndReconciliation() {
               })}
             </p>
           </div>
-          {reconciliation?.status === "closed" && (
-            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-              <CheckCircle2 className="text-green-600" size={20} />
-              <span className="font-medium text-green-700">Day Closed</span>
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={handleExportToExcel}
+              className="flex items-center gap-2"
+            >
+              <Download size={18} />
+              Export Excel
+            </Button>
+            {reconciliation?.status === "closed" && (
+              <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-2">
+                <CheckCircle2 className="text-green-600" size={20} />
+                <span className="font-medium text-green-700">Day Closed</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
