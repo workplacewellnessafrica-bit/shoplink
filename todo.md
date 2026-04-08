@@ -137,8 +137,8 @@
 - [x] POS download page with mobile and desktop options
 - [x] Mobile POS app (standalone, emoji-based categories, quick sale)
 - [x] Desktop POS app (full features, analytics, reconciliation)
-- [ ] App version management and auto-updates
-- [ ] Offline capability for mobile POS
+- [x] App version management and auto-updates
+- [x] Offline capability for mobile POS
 
 ### Mobile POS Features (from prototype)
 - [x] Emoji-based category selection

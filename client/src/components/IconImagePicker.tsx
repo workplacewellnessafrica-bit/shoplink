@@ -23,7 +23,7 @@ const EMOJI_CATEGORIES = {
   },
   health: {
     name: "Health & Beauty",
-    emojis: ["💊", "💉", "🧴", "🧼", "🧽", "💄", "💅", "🧴", "🧼", "🧽", "🧴", "🧼"],
+    emojis: ["💊", "💉", "🧴", "🧼", "🧽", "💄", "💅", "🧻", "🪮", "🧩", "🧪", "🧫"],
   },
   home: {
     name: "Home & Garden",
