@@ -32,14 +32,12 @@ export default function Home() {
               <Link href="/customer/login">My Orders</Link>
             </Button>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/pos">POS</Link>
+              <Link href="/tools">Tools</Link>
             </Button>
-            <Button size="sm" asChild>
-              <Link href="/admin">
-                <Store className="h-3.5 w-3.5 mr-1.5" />
-                My Store
-              </Link>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/settings">Settings</Link>
             </Button>
+
           </div>
         </div>
       </nav>
@@ -63,12 +61,7 @@ export default function Home() {
                 Explore Stores <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/admin">
-                <Store className="mr-2 h-4 w-4" />
-                List Your Business
-              </Link>
-            </Button>
+
           </div>
         </div>
 

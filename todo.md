@@ -110,3 +110,67 @@
 - [x] Integration tests for multi-role access control
 - [x] E2E tests for POS checkout flow
 - [x] Barcode generation and scanning tests
+
+
+## Phase 3: Bug Fixes & Improvements
+
+### Critical Fixes
+- [x] Add logout button to settings page
+- [x] Fix OTP verification flow and redirect to order history
+- [x] Add email notifications on order placement
+- [x] Add email notifications on POS checkout
+- [ ] Implement icon/emoji picker for POS mobile interface
+- [ ] Polish UI/UX for professional appearance
+- [ ] Verify all features work end-to-end
+
+
+## Phase 4: POS Restructuring & Store Onboarding
+
+### Store Onboarding Wizard
+- [x] Onboarding flow for new businesses (feature selection, system setup)
+- [x] Feature toggles: POS, Analytics, Inventory Management, Multi-attendant
+- [x] Business customization: branding, payment methods, tax settings
+- [ ] Lean system loading based on selected features
+- [x] Onboarding completion and dashboard redirect
+
+### POS Download & Distribution
+- [x] POS download page with mobile and desktop options
+- [ ] Mobile POS app (standalone, emoji-based categories, quick sale)
+- [ ] Desktop POS app (full features, analytics, reconciliation)
+- [ ] App version management and auto-updates
+- [ ] Offline capability for mobile POS
+
+### Mobile POS Features (from prototype)
+- [ ] Emoji-based category selection
+- [ ] Quick sale interface with cart
+- [ ] Low-stock alerts with visual indicators
+- [ ] Transaction log with expandable details
+- [ ] Daily summary with revenue and top sellers
+- [ ] Admin PIN for sensitive operations
+
+### Desktop POS Features
+- [ ] Full inventory management interface
+- [ ] Advanced analytics and reporting
+- [ ] Multi-attendant support with role management
+- [ ] Day-end reconciliation with detailed breakdown
+- [ ] Barcode scanning and product search
+- [ ] Export capabilities (CSV, PDF)
+
+
+## Phase 5: Navigation Restructuring
+
+### Landing Page Updates
+- [x] Remove "List Your Business" button from home page
+- [x] Update navigation to include Tools link
+
+### Tools Page
+- [x] Create Tools page with POS downloads and guidelines
+- [x] POS download section (Android, Desktop/Windows)
+- [x] Integration guidelines: web catalogue to POS inventory sync
+- [x] Instructions for inventory linking between platforms
+- [x] Desktop POS user access to store admin section
+
+### Access Control
+- [ ] Desktop POS users can access /admin (store management)
+- [ ] Mobile POS users have read-only access
+- [ ] Implement role-based access control for store features

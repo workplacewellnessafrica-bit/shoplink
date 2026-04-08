@@ -12,6 +12,10 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import CustomerOTPPortal from "./pages/CustomerOTPPortal";
 import POSSystem from "./pages/POSSystem";
 import DayEndReconciliation from "./pages/DayEndReconciliation";
+import Settings from "./pages/Settings";
+import StoreOnboarding from "./pages/StoreOnboarding";
+import POSDownload from "./pages/POSDownload";
+import Tools from "./pages/Tools";
 
 function Router() {
   return (
@@ -25,6 +29,10 @@ function Router() {
       <Route path="/customer/orders" component={CustomerPortal} />
       <Route path="/pos" component={POSSystem} />
       <Route path="/reconciliation" component={DayEndReconciliation} />
+      <Route path="/settings" component={Settings} />
+      <Route path="/onboarding" component={StoreOnboarding} />
+      <Route path="/pos-download" component={POSDownload} />
+      <Route path="/tools" component={Tools} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

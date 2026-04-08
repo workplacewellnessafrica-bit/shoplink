@@ -30,6 +30,7 @@ import {
   getBusinessById,
 } from "./db";
 import { nanoid } from "nanoid";
+import { sendOrderConfirmationEmail } from "./email";
 
 // ─── OTP Router ───────────────────────────────────────────────────────────────
 export const otpRouter = router({
@@ -159,6 +160,16 @@ export const posRouter = router({
       for (const item of input.items) {
         await deductStock(item.productId, item.quantity);
       }
+      // Send confirmation email (async, don't wait)
+      const itemsForEmail = input.items.map((item) => ({ name: `Product #${item.productId}`, quantity: item.quantity, price: item.price }));
+      sendOrderConfirmationEmail(
+        "customer@example.com",
+        "Valued Customer",
+        transactionId,
+        itemsForEmail,
+        totalAmount,
+        business.name || "ShopLink Store"
+      ).catch((err) => console.error("Failed to send POS confirmation email:", err));
       return { transactionId, totalAmount };
     }),
 
