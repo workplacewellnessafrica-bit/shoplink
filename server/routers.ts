@@ -28,9 +28,12 @@ import {
   updateBusiness,
   updateOrderStatus,
   updateProduct,
+  updateCustomer,
+  getCustomerById,
 } from "./db";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
+import { otpRouter, attendantRouter, barcodeRouter, posRouter, reconciliationRouter } from "./routers-pos";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function slugify(name: string): string {
@@ -510,6 +513,11 @@ export const appRouter = router({
   product: productRouter,
   order: orderRouter,
   customer: customerRouter,
+  otp: otpRouter,
+  attendant: attendantRouter,
+  barcode: barcodeRouter,
+  pos: posRouter,
+  reconciliation: reconciliationRouter,
 });
 
 export type AppRouter = typeof appRouter;
