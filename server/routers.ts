@@ -46,7 +46,8 @@ function slugify(name: string): string {
 // ─── Business Router ──────────────────────────────────────────────────────────
 const businessRouter = router({
   getAll: publicProcedure.query(async () => {
-    return getAllBusinesses();
+    const businesses = await getAllBusinesses();
+    return businesses ?? [];
   }),
 
   getBySlug: publicProcedure
@@ -58,7 +59,8 @@ const businessRouter = router({
     }),
 
   getMine: protectedProcedure.query(async ({ ctx }) => {
-    return getBusinessByUserId(ctx.user.id);
+    const business = await getBusinessByUserId(ctx.user.id);
+    return business ?? null;
   }),
 
   create: protectedProcedure
@@ -140,13 +142,15 @@ const productRouter = router({
   listByBusiness: publicProcedure
     .input(z.object({ businessId: z.number() }))
     .query(async ({ input }) => {
-      return getProductsByBusiness(input.businessId, false);
+      const products = await getProductsByBusiness(input.businessId, false);
+      return products ?? [];
     }),
 
   listMine: protectedProcedure.query(async ({ ctx }) => {
     const business = await getBusinessByUserId(ctx.user.id);
     if (!business) return [];
-    return getProductsByBusiness(business.id, true);
+    const products = await getProductsByBusiness(business.id, true);
+    return products ?? [];
   }),
 
   getById: publicProcedure
@@ -362,7 +366,8 @@ const orderRouter = router({
   getByBusiness: protectedProcedure.query(async ({ ctx }) => {
     const business = await getBusinessByUserId(ctx.user.id);
     if (!business) return [];
-    return getOrdersByBusiness(business.id);
+    const orders = await getOrdersByBusiness(business.id);
+    return orders ?? [];
   }),
 
   getOrderDetails: protectedProcedure
@@ -373,8 +378,8 @@ const orderRouter = router({
       if (!order) throw new TRPCError({ code: "NOT_FOUND" });
       if (business && order.businessId !== business.id)
         throw new TRPCError({ code: "FORBIDDEN" });
-      const items = await getOrderItems(input.orderId);
-      return { order, items };
+      const items = await getOrderItems(input.orderId) ?? [];
+      return { order, items: items ?? [] };
     }),
 
   updateStatus: protectedProcedure
@@ -464,7 +469,8 @@ const customerRouter = router({
     const raw = ctx.req.cookies?.[CUSTOMER_COOKIE];
     if (!raw) return null;
     try {
-      return JSON.parse(raw) as { id: number; name: string; phone: string };
+      const parsed = JSON.parse(raw) as { id: number; name: string; phone: string };
+      return parsed ?? null;
     } catch {
       return null;
     }
@@ -473,7 +479,8 @@ const customerRouter = router({
   myOrders: publicProcedure
     .input(z.object({ customerId: z.number() }))
     .query(async ({ input }) => {
-      return getOrdersByCustomer(input.customerId);
+      const orders = await getOrdersByCustomer(input.customerId);
+      return orders ?? [];
     }),
 
   orderDetails: publicProcedure
@@ -482,9 +489,9 @@ const customerRouter = router({
       const order = await getOrderById(input.orderId);
       if (!order || order.customerId !== input.customerId)
         throw new TRPCError({ code: "NOT_FOUND" });
-      const items = await getOrderItems(input.orderId);
+      const items = await getOrderItems(input.orderId) ?? [];
       const business = await getBusinessById(order.businessId);
-      return { order, items, business };
+      return { order, items, business: business ?? null };
     }),
 });
 
@@ -492,11 +499,11 @@ const customerRouter = router({
 export const appRouter = router({
   system: systemRouter,
   auth: router({
-    me: publicProcedure.query((opts) => opts.ctx.user),
+    me: publicProcedure.query((opts) => opts.ctx.user ?? null),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      return { success: true } as const;
+      return { success: true };
     }),
   }),
   business: businessRouter,
