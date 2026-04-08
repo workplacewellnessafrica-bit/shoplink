@@ -200,7 +200,7 @@
 - [x] Offline mode with sync on reconnection
 
 ### Testing & Documentation
-- [ ] End-to-end tests for POS workflows
-- [ ] Integration tests for multi-role access
-- [ ] API documentation for POS endpoints
-- [ ] User guide for business owners and attendants
+- [x] End-to-end tests for POS workflows
+- [x] Integration tests for multi-role access
+- [x] API documentation for POS endpoints
+- [x] User guide for business owners and attendants
