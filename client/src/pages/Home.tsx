@@ -10,6 +10,12 @@ import {
   ShoppingBag,
   Store,
   Zap,
+  Smartphone,
+  Monitor,
+  DollarSign,
+  BarChart3,
+  MessageSquare,
+  Wifi,
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -58,10 +64,14 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button size="lg" asChild>
               <a href="#stores">
-                Explore Stores <ArrowRight className="ml-2 h-4 w-4" />
+                Start Shopping <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
-
+            <Button size="lg" variant="outline" asChild>
+              <a href="#features">
+                Learn More
+              </a>
+            </Button>
           </div>
         </div>
 
@@ -71,15 +81,22 @@ export default function Home() {
       </section>
 
       {/* Feature Highlights */}
-      <section className="py-12 border-b bg-card">
+      <section id="features" className="py-16 border-b bg-card">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-display font-bold mb-2">Everything Your Business Needs</h2>
+            <p className="text-muted-foreground">Complete commerce platform for modern businesses</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { icon: ShoppingBag, title: "Browse & Shop", desc: "Explore products from multiple local businesses in one place." },
               { icon: Zap, title: "WhatsApp Checkout", desc: "Place orders instantly — your cart is sent directly to the business." },
               { icon: Package, title: "Track Orders", desc: "Register with your phone number to view your order history anytime." },
+              { icon: Smartphone, title: "Mobile POS", desc: "Fast, intuitive point-of-sale system designed for speed and accuracy." },
+              { icon: Monitor, title: "Desktop Dashboard", desc: "Comprehensive analytics and inventory management for your business." },
+              { icon: DollarSign, title: "Payment Methods", desc: "Support multiple payment options including M-Pesa and cash." },
             ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex items-start gap-4 p-4">
+              <div key={title} className="flex items-start gap-4 p-6 bg-background rounded-xl border hover:border-primary/30 transition-colors">
                 <div className="p-2.5 bg-primary/10 rounded-xl shrink-0">
                   <Icon className="h-5 w-5 text-primary" />
                 </div>
@@ -99,7 +116,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl font-display font-semibold">Featured Stores</h2>
-              <p className="text-muted-foreground mt-1">Discover businesses in your community</p>
+              <p className="text-muted-foreground mt-1">From small kiosks to established businesses — find what you need</p>
             </div>
             {businesses && businesses.length > 0 && (
               <Badge variant="secondary">{businesses.length} store{businesses.length !== 1 ? "s" : ""}</Badge>
@@ -188,14 +205,14 @@ export default function Home() {
       {/* CTA for businesses */}
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="container text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl font-display font-bold mb-4">Ready to Start Selling?</h2>
+          <h2 className="text-3xl font-display font-bold mb-4">Ready to Take Control?</h2>
           <p className="text-primary-foreground/80 mb-8">
-            Create your free storefront in minutes. Upload products, share your link, and start receiving orders via WhatsApp.
+            Join businesses across the region managing sales, inventory, and cash flow seamlessly. Create your free storefront in minutes.
           </p>
           <Button size="lg" variant="secondary" asChild>
             <Link href="/admin">
               <Store className="mr-2 h-4 w-4" />
-              Open Your Store — It's Free
+              Create Your Store — Free
             </Link>
           </Button>
         </div>
