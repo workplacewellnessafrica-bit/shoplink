@@ -321,3 +321,37 @@
 - [ ] Test all admin pages on mobile viewport (375px width)
 - [ ] Ensure buttons and inputs are touch-friendly (min 44px height)
 - [ ] Improve form field spacing and labels on mobile
+
+## Phase 11: Email, OTP, and WhatsApp Notifications
+
+### Email Configuration
+- [x] Set up SMTP credentials via webdev_request_secrets (EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASS, EMAIL_FROM)
+- [ ] Test email sending with real SMTP provider (Gmail, SendGrid, or similar)
+- [ ] Add business email field to business schema for order notifications
+- [ ] Send order confirmation emails to customers
+- [ ] Send order notification emails to business owners
+
+### Attendant Invite Emails
+- [x] Create attendant invite email template
+- [x] Send invite email when attendant is created
+- [ ] Implement email verification link with token
+- [ ] Create attendant acceptance flow (email link → create account)
+
+### OTP & SMS Configuration
+- [x] Set up Twilio credentials via webdev_request_secrets (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER)
+- [x] Test OTP delivery via WhatsApp (primary)
+- [x] Test SMS fallback for OTP
+- [x] Verify phone number normalization works correctly
+
+### WhatsApp Notifications
+- [ ] Fix WhatsApp order notification to use correct API function
+- [ ] Test WhatsApp order notifications to business owners
+- [ ] Test WhatsApp order notifications to customers
+- [ ] Verify message formatting and content
+- [ ] Add WhatsApp status tracking
+
+### Testing & Validation
+- [ ] Test complete order flow with notifications
+- [ ] Verify all notification channels work (Email, WhatsApp, SMS)
+- [ ] Check logs for notification delivery status
+- [ ] Test error handling and fallbacks

@@ -33,6 +33,7 @@ import {
 } from "./db";
 import { nanoid } from "nanoid";
 import { sendOrderConfirmationEmail } from "./email";
+import { sendAttendantInviteEmail } from "./attendantInvite";
 import { broadcastInventoryUpdate } from "./_core/inventoryEvents";
 import { sendOTPViaSMS, isSMSAvailable } from "./_core/sms";
 
@@ -115,6 +116,18 @@ export const attendantRouter = router({
       const business = await getBusinessByUserId(ctx.user.id);
       if (!business) throw new TRPCError({ code: "NOT_FOUND", message: "Create a store first" });
       const attendantId = await createAttendant({ businessId: business.id, name: input.name, email: input.email, role: input.role });
+      
+      // Send invite email if email is provided
+      if (input.email) {
+        const inviteLink = `${process.env.VITE_APP_URL || "http://localhost:3000"}/invite/attendant/${attendantId}`;
+        try {
+          await sendAttendantInviteEmail(input.email, input.name, business.name, inviteLink);
+          console.log(`[Attendant] Invite email sent to ${input.email}`);
+        } catch (err) {
+          console.error(`[Attendant] Failed to send invite email to ${input.email}:`, err);
+        }
+      }
+      
       return { id: attendantId, ...input };
     }),
 

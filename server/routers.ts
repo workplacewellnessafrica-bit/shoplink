@@ -357,7 +357,7 @@ const orderRouter = router({
           customerName: input.customerName,
           customerPhone: input.customerPhone,
           businessName: business.name,
-          businessEmail: undefined, // Email notifications can be configured in business settings
+          businessEmail: undefined, // Email can be added to business settings later
           businessWhatsApp: business.whatsappNumber,
           items: resolvedItems.map((i) => ({
             name: i.productName,
