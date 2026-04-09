@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   Business,
@@ -21,6 +21,8 @@ import {
   posTransactions,
   dayEndReconciliations,
   deviceSessions,
+  productVariants,
+  lowStockAlerts,
   InsertOtpVerification,
   InsertAttendant,
   InsertProductBarcode,
@@ -28,6 +30,8 @@ import {
   InsertDayEndReconciliation,
   InsertDeviceSession,
   InsertBusinessFeature,
+  InsertProductVariant,
+  InsertLowStockAlert,
 } from "../drizzle/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -538,4 +542,80 @@ export async function getPopularProductsByBusiness(businessId: number, limit = 1
     )
     .orderBy(desc(products.updatedAt))
     .limit(limit);
+}
+
+
+// ─── Product Variants ─────────────────────────────────────────────────────────
+export async function getProductVariants(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(productVariants)
+    .where(eq(productVariants.productId, productId))
+    .orderBy(asc(productVariants.order));
+}
+
+export async function createProductVariant(data: InsertProductVariant) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const result = await db.insert(productVariants).values(data);
+  return (result[0] as any).insertId as number;
+}
+
+export async function updateProductVariant(id: number, data: Partial<InsertProductVariant>) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.update(productVariants).set(data).where(eq(productVariants.id, id));
+}
+
+export async function deleteProductVariant(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.delete(productVariants).where(eq(productVariants.id, id));
+}
+
+// ─── Low Stock Alerts ──────────────────────────────────────────────────────────
+export async function getLowStockAlerts(businessId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(lowStockAlerts)
+    .where(eq(lowStockAlerts.businessId, businessId));
+}
+
+export async function getLowStockAlertForProduct(businessId: number, productId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db
+    .select()
+    .from(lowStockAlerts)
+    .where(
+      and(
+        eq(lowStockAlerts.businessId, businessId),
+        eq(lowStockAlerts.productId, productId)
+      )
+    )
+    .limit(1);
+  return result[0];
+}
+
+export async function createLowStockAlert(data: InsertLowStockAlert) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  const result = await db.insert(lowStockAlerts).values(data);
+  return (result[0] as any).insertId as number;
+}
+
+export async function updateLowStockAlert(id: number, data: Partial<InsertLowStockAlert>) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.update(lowStockAlerts).set(data).where(eq(lowStockAlerts.id, id));
+}
+
+export async function deleteLowStockAlert(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.delete(lowStockAlerts).where(eq(lowStockAlerts.id, id));
 }

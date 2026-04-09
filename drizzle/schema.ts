@@ -73,6 +73,50 @@ export const products = mysqlTable(
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = typeof products.$inferInsert;
 
+// ─── Product Variants (sizes, options) ────────────────────────────────────────
+export const productVariants = mysqlTable(
+  "productVariants",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    productId: int("productId").notNull(), // FK → products.id
+    name: varchar("name", { length: 100 }).notNull(), // e.g., "Small", "½ kg", "500ml"
+    sku: varchar("sku", { length: 50 }), // e.g., "PROD-001-SM"
+    price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Variant-specific price
+    stock: int("stock").default(0).notNull(), // Variant-specific stock
+    order: int("order").default(0).notNull(), // Display order
+    isActive: boolean("isActive").default(true).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (table) => ({
+    productIdIdx: index("productIdIdx").on(table.productId),
+    skuIdx: index("skuIdx").on(table.sku),
+  })
+);
+
+export type ProductVariant = typeof productVariants.$inferSelect;
+export type InsertProductVariant = typeof productVariants.$inferInsert;
+
+// ─── Low Stock Alerts ─────────────────────────────────────────────────────────
+export const lowStockAlerts = mysqlTable(
+  "lowStockAlerts",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    businessId: int("businessId").notNull(), // FK → businesses.id
+    productId: int("productId").notNull(), // FK → products.id
+    threshold: int("threshold").default(10).notNull(), // Alert when stock < threshold
+    isActive: boolean("isActive").default(true).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (table) => ({
+    businessIdIdx: index("businessIdIdx").on(table.businessId),
+    productIdIdx: index("productIdIdx").on(table.productId),
+  })
+);
+
+export type LowStockAlert = typeof lowStockAlerts.$inferSelect;
+export type InsertLowStockAlert = typeof lowStockAlerts.$inferInsert;
+
 // ─── Customers (phone-based auth, separate from OAuth users) ──────────────────
 export const customers = mysqlTable(
   "customers",
