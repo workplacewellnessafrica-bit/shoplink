@@ -423,3 +423,49 @@
 - [ ] Verify currency displays correctly on mobile
 - [ ] Test with various price ranges
 - [ ] Verify API responses include currency
+
+
+## Phase 15: Product Variant Editor
+
+### Database Schema Updates
+- [x] Extend productVariants table with attributes (size, color, quality, origin, materials)
+- [x] Add variant image support
+- [x] Create migration for new variant fields
+
+### Variant API Endpoints
+- [x] Create endpoint to list variants for a product
+- [x] Create endpoint to add variant
+- [x] Create endpoint to update variant
+- [x] Create endpoint to delete variant
+- [x] Create endpoint to reorder variants
+
+### Variant Editor UI
+- [x] Build variant editor floating card component
+- [x] Add size attribute input
+- [x] Add color attribute input
+- [x] Add quality attribute input
+- [x] Add origin attribute input
+- [x] Add materials attribute input
+- [x] Add variant price and stock fields
+- [x] Add variant image upload
+- [x] Implement add/edit/delete variant actions
+
+### Image Gallery
+- [x] Build fullscreen image gallery component
+- [x] Implement image zoom functionality
+- [x] Add image navigation (prev/next)
+- [x] Add close button for gallery
+- [x] Integrate gallery with variant display
+
+### Integration
+- [x] Add Variants tab to product form
+- [x] Show variants list under main product
+- [x] Wire up variant editor to API
+- [ ] Update Storefront to display variants
+- [ ] Update POS to support variant selection
+
+### Testing & Validation
+- [ ] Test variant creation and editing
+- [ ] Test image gallery fullscreen
+- [ ] Test variant display in storefront
+- [ ] Verify all attributes save correctly

@@ -84,6 +84,16 @@ export const productVariants = mysqlTable(
     price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Variant-specific price
     stock: int("stock").default(0).notNull(), // Variant-specific stock
     order: int("order").default(0).notNull(), // Display order
+    // Variant attributes
+    size: varchar("size", { length: 100 }), // e.g., "Small", "Medium", "Large"
+    color: varchar("color", { length: 100 }), // e.g., "Red", "Blue"
+    quality: varchar("quality", { length: 100 }), // e.g., "Premium", "Standard"
+    origin: varchar("origin", { length: 100 }), // e.g., "Kenya", "Uganda"
+    materials: text("materials"), // e.g., "100% Cotton", "Polyester blend"
+    // Variant images
+    imageUrl: text("imageUrl"), // Primary variant image
+    imageKey: varchar("imageKey", { length: 500 }), // S3 key for image
+    description: text("description"), // Variant-specific description
     isActive: boolean("isActive").default(true).notNull(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

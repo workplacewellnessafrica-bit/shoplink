@@ -43,6 +43,13 @@
       "when": 1775714362685,
       "tag": "0005_outstanding_nicolaos",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1775755249213,
+      "tag": "0006_silky_lethal_legion",
+      "breakpoints": true
     }
   ]
 }

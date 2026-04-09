@@ -34,6 +34,7 @@ import {
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import { otpRouter, attendantRouter, barcodeRouter, posRouter, reconciliationRouter } from "./routers-pos";
+import { variantRouter } from "./routers-variants";
 import { broadcastInventoryUpdate } from "./_core/inventoryEvents";
 import { notifyBusinessOfNewOrder } from "./_core/businessNotifications";
 
@@ -555,6 +556,7 @@ export const appRouter = router({
   barcode: barcodeRouter,
   pos: posRouter,
   reconciliation: reconciliationRouter,
+  variant: variantRouter,
 });
 
 export type AppRouter = typeof appRouter;

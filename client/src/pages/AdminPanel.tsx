@@ -43,6 +43,7 @@ import {
 import { useRef, useState } from "react";
 import { Link } from "wouter";
 import IconImagePicker from "@/components/IconImagePicker";
+import { VariantEditor } from "@/components/VariantEditor";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { useTabPersistence } from "@/hooks/useTabPersistence";
 import { formatPrice } from "@shared/currency";
@@ -489,6 +490,7 @@ export default function AdminPanel() {
   const { hasAccess } = useRoleAccess("admin");
   const [productDialogOpen, setProductDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [selectedProductForVariants, setSelectedProductForVariants] = useState<number | null>(null);
   const { activeTab, setActiveTab } = useTabPersistence("admin-panel", "products");
   const utils = trpc.useUtils();
 
@@ -774,12 +776,34 @@ export default function AdminPanel() {
                         </Badge>
                         {!product.isActive && <Badge variant="outline">Inactive</Badge>}
                       </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-3"
+                        onClick={() => setSelectedProductForVariants(product.id)}
+                      >
+                        Manage Variants
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
               </div>
             )}
           </TabsContent>
+
+          {/* Variants Modal */}
+          {selectedProductForVariants && (
+            <Dialog open={!!selectedProductForVariants} onOpenChange={(open) => {
+              if (!open) setSelectedProductForVariants(null);
+            }}>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Manage Variants</DialogTitle>
+                </DialogHeader>
+                <VariantEditor productId={selectedProductForVariants} />
+              </DialogContent>
+            </Dialog>
+          )}
 
           {/* Orders Tab */}
           <TabsContent value="orders">
