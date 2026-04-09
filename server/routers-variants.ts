@@ -57,12 +57,14 @@ export const variantRouter = router({
         imageKey = result.key;
       }
 
+      const priceDecimal = parseFloat(input.price).toFixed(2);
+      
       const result = await db.insert(productVariants).values({
         productId: input.productId,
         name: input.name,
         sku: input.sku || null,
-        price: input.price,
-        stock: input.stock,
+        price: priceDecimal as any,
+        stock: parseInt(input.stock.toString()),
         size: input.size || null,
         color: input.color || null,
         quality: input.quality || null,
@@ -72,6 +74,7 @@ export const variantRouter = router({
         imageUrl: imageUrl || null,
         imageKey: imageKey || null,
         order: 0,
+        isActive: true,
       } as any);
 
       return { success: true };

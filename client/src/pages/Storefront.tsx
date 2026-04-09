@@ -219,18 +219,23 @@ function CartSidebar({
               <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any special instructions..." />
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">
-              <MessageCircle className="inline h-4 w-4 mr-1.5" />
-              Your order will be sent to <strong>{businessName}</strong> via WhatsApp and saved to our system.
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800 space-y-2">
+              <div className="flex items-start gap-2">
+                <MessageCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold">Confirm Order with {businessName}</p>
+                  <p className="text-xs mt-1">Your order details will open in WhatsApp. Send them to the business to confirm and complete your order.</p>
+                </div>
+              </div>
             </div>
 
-            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={createOrder.isPending}>
+            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold" disabled={createOrder.isPending} size="lg">
               {createOrder.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <MessageCircle className="mr-2 h-4 w-4" />
               )}
-              Place Order & Open WhatsApp
+              Confirm Order on WhatsApp
             </Button>
           </form>
         </DialogContent>

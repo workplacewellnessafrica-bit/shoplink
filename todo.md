@@ -474,3 +474,36 @@
 ## Bug Fixes
 
 - [x] Fix variant creation database error - constraint violation when adding variant with attributes
+
+
+## Phase 16: Variant Editor Improvements & Order Notifications
+
+### Variant Creation Fixes
+- [x] Fix price data type conversion (string to decimal)
+- [x] Add field validation and guidelines to variant editor
+- [x] Mark mandatory fields (Variant Name, Price, Stock) clearly
+- [x] Mark optional fields with helper text
+- [x] Add input format guidelines (e.g., "e.g., 100% Cotton, Polyester blend" for Materials)
+- [ ] Improve error messages for failed variant creation
+
+### Checkout Improvements
+- [x] Clarify WhatsApp CTA button text: "Confirm Order on WhatsApp"
+- [x] Add tooltip explaining WhatsApp is for order confirmation with business
+- [x] Improve button styling to make it more prominent
+- [x] Add order summary before WhatsApp redirect
+
+### In-App Notifications
+- [x] Create notifications table in database
+- [ ] Add notification API endpoints (list, mark as read, delete)
+- [ ] Add notification tab to customer portal
+- [ ] Send notification when customer places order
+- [ ] Send notification to business when order is placed
+- [ ] Display notification bell icon with unread count
+- [ ] Implement real-time notification updates via WebSocket
+- [ ] Add notification preferences (email, SMS, in-app)
+
+### Testing & Validation
+- [ ] Test variant creation with all data types
+- [ ] Test notification delivery for orders
+- [ ] Verify field validation works correctly
+- [ ] Test WhatsApp CTA clarity on mobile

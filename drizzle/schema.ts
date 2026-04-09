@@ -351,3 +351,30 @@ export type InsertDeviceSession = typeof deviceSessions.$inferInsert;
 
 // ─── Indexes for common queries ───────────────────────────────────────────────
 // Already defined in table definitions above for performance
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+export const notifications = mysqlTable(
+  "notifications",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(), // FK → users.id (recipient)
+    businessId: int("businessId"), // FK → businesses.id (for business notifications, null for customer)
+    type: mysqlEnum("type", ["order_placed", "order_confirmed", "order_shipped", "order_delivered", "payment_received", "low_stock", "new_order", "system"]).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    message: text("message").notNull(),
+    relatedOrderId: int("relatedOrderId"), // FK → orders.id (if applicable)
+    relatedProductId: int("relatedProductId"), // FK → products.id (if applicable)
+    isRead: boolean("isRead").default(false).notNull(),
+    actionUrl: text("actionUrl"), // URL to navigate to (e.g., order details)
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("notifUserIdIdx").on(table.userId),
+    businessIdIdx: index("notifBusinessIdIdx").on(table.businessId),
+    isReadIdx: index("notifIsReadIdx").on(table.isRead),
+    createdAtIdx: index("notifCreatedAtIdx").on(table.createdAt),
+  })
+);
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;

@@ -270,6 +270,16 @@ function VariantEditorModal({
             />
           </div>
 
+          {/* Field Guidelines */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+            <p className="text-xs font-semibold text-blue-900 mb-2">Field Guidelines</p>
+            <ul className="text-xs text-blue-800 space-y-1">
+              <li><span className="font-semibold">* Mandatory:</span> Variant Name, Price, Stock Quantity</li>
+              <li><span className="font-semibold">Optional:</span> All other fields</li>
+              <li><span className="font-semibold">Any text accepted</span> - use your naming convention</li>
+            </ul>
+          </div>
+
           {/* Basic Info */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
