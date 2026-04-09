@@ -1,0 +1,1 @@
+ALTER TABLE `otpVerifications` ADD `deliveryMethod` enum('whatsapp','sms','none') DEFAULT 'none' NOT NULL;

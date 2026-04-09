@@ -158,6 +158,7 @@ export const otpVerifications = mysqlTable(
     otpCode: varchar("otpCode", { length: 6 }).notNull(),
     expiresAt: timestamp("expiresAt").notNull(),
     attempts: int("attempts").default(0).notNull(),
+    deliveryMethod: mysqlEnum("deliveryMethod", ["whatsapp", "sms", "none"]).default("none").notNull(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
   },
   (table) => ({

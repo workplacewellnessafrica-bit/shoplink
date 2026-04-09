@@ -33,6 +33,7 @@ import {
 import { nanoid } from "nanoid";
 import { sendOrderConfirmationEmail } from "./email";
 import { broadcastInventoryUpdate } from "./_core/inventoryEvents";
+import { sendOTPViaSMS, isSMSAvailable } from "./_core/sms";
 
 // ─── OTP Router ───────────────────────────────────────────────────────────────
 export const otpRouter = router({
@@ -48,12 +49,45 @@ export const otpRouter = router({
         expiresAt,
         attempts: 0,
       });
-      // Send OTP via WhatsApp
-      const sent = await sendWhatsAppOTP(input.phone, otpCode);
-      if (!sent) {
-        console.warn(`[OTP] Failed to send OTP to ${input.phone} via WhatsApp`);
+
+      // Try WhatsApp first, fallback to SMS
+      let deliveryMethod = "none";
+      let deliverySuccess = false;
+
+      console.log(`[OTP] Attempting to send OTP to ${input.phone}`);
+      const whatsappSent = await sendWhatsAppOTP(input.phone, otpCode);
+      if (whatsappSent) {
+        console.log(`[OTP] OTP sent successfully via WhatsApp`);
+        deliveryMethod = "whatsapp";
+        deliverySuccess = true;
+      } else {
+        console.warn(`[OTP] WhatsApp delivery failed, attempting SMS fallback`);
+        // Fallback to SMS if available
+        if (isSMSAvailable()) {
+          const smsSent = await sendOTPViaSMS(input.phone, otpCode);
+          if (smsSent.success) {
+            console.log(`[OTP] OTP sent successfully via SMS (fallback)`);
+            deliveryMethod = "sms";
+            deliverySuccess = true;
+          } else {
+            console.error(`[OTP] SMS fallback failed: ${smsSent.error}`);
+          }
+        } else {
+          console.warn(`[OTP] SMS service not configured`);
+        }
       }
-      return { success: true, message: sent ? "OTP sent via WhatsApp" : "OTP generated (WhatsApp delivery failed - check phone number)" };
+
+      if (!deliverySuccess) {
+        console.warn(`[OTP] Failed to send OTP to ${input.phone} via any method`);
+      }
+
+      return {
+        success: true,
+        message: deliverySuccess
+          ? `OTP sent via ${deliveryMethod.toUpperCase()}`
+          : "OTP generated (delivery failed - check phone number and try again)",
+        deliveryMethod,
+      };
     }),
 
   verify: publicProcedure

@@ -35,6 +35,8 @@ import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import { otpRouter, attendantRouter, barcodeRouter, posRouter, reconciliationRouter } from "./routers-pos";
 import { broadcastInventoryUpdate } from "./_core/inventoryEvents";
+import { notifyBusinessOfNewOrder } from "./_core/businessNotifications";
+import { notifyBusinessOfNewOrder } from "./_core/businessNotifications";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function slugify(name: string): string {
@@ -343,8 +345,29 @@ const orderRouter = router({
         await deductStock(item.productId, item.quantity);
       }
 
-      // Build WhatsApp message
+      // Get business details
       const business = await getBusinessById(input.businessId);
+      if (!business) throw new TRPCError({ code: "NOT_FOUND", message: "Business not found" });
+
+      // Send automatic email and WhatsApp notifications to business owner
+      const orderUrl = `${process.env.VITE_APP_URL || "http://localhost:3000"}/admin?orderId=${orderId}`;
+      notifyBusinessOfNewOrder({
+        orderId,
+        customerName: input.customerName,
+        customerPhone: input.customerPhone,
+        businessName: business.name,
+        businessEmail: business.email || undefined,
+        businessWhatsApp: business.whatsappNumber,
+        items: resolvedItems.map((i) => ({
+          name: i.productName,
+          quantity: i.quantity,
+          price: i.productPrice,
+        })),
+        total: totalAmount,
+        orderUrl,
+      }).catch((err) => console.error("[Order] Failed to notify business:", err));
+
+      // Build WhatsApp message for customer
       if (business) {
         const lines = [
           `🛍️ *New Order #${orderId}*`,

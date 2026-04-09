@@ -237,3 +237,63 @@
 - [x] Test concurrent inventory updates
 - [x] Test reconnection scenarios
 - [x] Test business isolation (no cross-business updates)
+
+
+## Phase 8: SMS Fallback for OTP Delivery
+
+### Twilio Integration
+- [ ] Install Twilio SDK
+- [ ] Create Twilio SMS service helper
+- [ ] Configure Twilio credentials via environment variables
+- [ ] Implement error handling and retry logic
+
+### OTP Delivery Strategy
+- [ ] Modify OTP router to try WhatsApp first
+- [ ] Fallback to SMS if WhatsApp fails
+- [ ] Track delivery method in database
+- [ ] Log delivery attempts and failures
+
+### Testing
+- [ ] Unit tests for SMS sending
+- [ ] Integration tests for fallback scenarios
+- [ ] Test WhatsApp success + SMS fallback
+- [ ] Test both WhatsApp and SMS failures
+
+### Documentation
+- [ ] Update OTP flow documentation
+- [ ] Add SMS configuration guide
+- [ ] Document fallback strategy
+
+
+## Phase 9: Critical Bug Fixes & Notifications
+
+### User Authentication Issues
+- [x] Fix logout button functionality
+- [x] Implement user switching (logout and login as different user)
+- [x] Add "Switch Account" option in settings
+- [x] Clear session cookies on logout
+- [x] Redirect to home after logout
+
+### Business Setup & Onboarding
+- [x] Fix business creation flow
+- [ ] Add business setup wizard with step-by-step guidance
+- [ ] Implement feature selection (POS, Analytics, etc.)
+- [ ] Add business profile completion checklist
+- [ ] Validate required fields before allowing access to dashboard
+
+### Password Management
+- [ ] Implement password recovery/reset feature
+- [ ] Add "Forgot Password" link on login page
+- [ ] Send password reset email with secure token
+- [ ] Create password reset page
+- [ ] Validate password reset token expiry
+- [ ] Update password securely
+
+### Business Notifications
+- [x] Implement automatic email notifications on order placement
+- [x] Send order details to business email
+- [x] Include customer info, items, total amount in email
+- [x] Implement automatic WhatsApp notifications on order placement
+- [x] Send order summary to business WhatsApp number
+- [ ] Add notification preferences in business settings
+- [ ] Track notification delivery status
