@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { getLoginUrl } from "@/const";
 
 export function useBusinessAccess() {
   const [, setLocation] = useLocation();
@@ -13,10 +14,9 @@ export function useBusinessAccess() {
     if (userLoading || businessLoading) return;
 
     if (!user) {
-      const loginUrl = new URL(window.location.origin);
-      loginUrl.pathname = "/api/oauth/login";
-      loginUrl.searchParams.set("returnTo", window.location.origin + "/admin");
-      window.location.href = loginUrl.toString();
+      // Not logged in - redirect to OAuth login
+      const loginUrl = getLoginUrl("/admin");
+      window.location.href = loginUrl;
       return;
     }
 

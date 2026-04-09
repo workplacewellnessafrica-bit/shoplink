@@ -210,7 +210,9 @@ export default function Home() {
           <p className="text-primary-foreground/80 mb-8">
             Join businesses across the region managing sales, inventory, and cash flow seamlessly. Create your free storefront in minutes.
           </p>
-          <Button size="lg" variant="secondary" asChild>
+          <p className="text-sm text-primary-foreground/70 mb-8">
+            ✨ 15 days free trial — no credit card required
+          </p>
             <Link href="/admin">
               <Store className="mr-2 h-4 w-4" />
               Create Your Store — Free
