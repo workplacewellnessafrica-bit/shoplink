@@ -45,6 +45,7 @@ import { Link } from "wouter";
 import IconImagePicker from "@/components/IconImagePicker";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { useTabPersistence } from "@/hooks/useTabPersistence";
+import { formatPrice } from "@shared/currency";
 
 // ─── Image Upload Helper ───────────────────────────────────────────────────────
 function fileToBase64(file: File): Promise<string> {
@@ -742,7 +743,7 @@ export default function AdminPanel() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <p className="font-semibold truncate">{product.name}</p>
-                          <p className="text-primary font-bold">${parseFloat(product.price).toFixed(2)}</p>
+                          <p className="text-primary font-bold">{formatPrice(parseFloat(product.price))}</p>
                         </div>
                         <div className="flex gap-1 shrink-0">
                           <Button
@@ -812,7 +813,7 @@ export default function AdminPanel() {
                           <p className="text-xs text-muted-foreground truncate max-w-xs">{order.deliveryAddress}</p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-bold text-primary">${parseFloat(order.totalAmount).toFixed(2)}</span>
+                          <span className="font-bold text-primary">{formatPrice(parseFloat(order.totalAmount))}</span>
                           <Select
                             value={order.status}
                             onValueChange={(val) =>

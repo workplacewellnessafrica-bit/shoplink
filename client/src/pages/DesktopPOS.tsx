@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { formatPrice } from "@shared/currency";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -243,8 +244,7 @@ export default function DesktopPOS() {
             </div>
             <div className="flex items-center gap-6">
               <div className="text-right">
-                <div className="text-4xl font-bold text-indigo-600">KES {total.toFixed(2)}</div>
-                <p className="text-sm text-gray-600">{itemCount} items</p>
+               <div className="text-3xl font-bold text-indigo-600">{formatPrice(total)}</div>               <p className="text-sm text-gray-600">{itemCount} items</p>
               </div>
               {userRole === "admin" && (
                 <Button
@@ -314,7 +314,7 @@ export default function DesktopPOS() {
                         disabled={product.stock === 0}
                       >
                         <div className="text-sm font-semibold text-center line-clamp-2">{product.name}</div>
-                        <div className="text-indigo-600 font-bold text-sm">KES {product.price}</div>
+                        <div className="text-indigo-600 font-bold text-sm">{formatPrice(product.price)}</div>
                         {product.stock < 5 && product.stock > 0 && (
                           <Badge variant="destructive" className="mt-1 text-xs">
                             {product.stock} left
@@ -376,7 +376,7 @@ export default function DesktopPOS() {
                                   <Plus className="h-2 w-2" />
                                 </Button>
                               </div>
-                              <span className="font-bold text-xs">KES {(item.price * item.quantity).toFixed(2)}</span>
+                              <span className="font-bold text-xs">{formatPrice(item.price * item.quantity)}</span>
                             </div>
                           </div>
                         ))}
@@ -385,11 +385,11 @@ export default function DesktopPOS() {
                       <div className="border-t pt-2 space-y-1 text-sm">
                         <div className="flex justify-between">
                           <span>Subtotal:</span>
-                          <span>KES {total.toFixed(2)}</span>
+                          <span>{formatPrice(total)}</span>
                         </div>
                         <div className="flex justify-between font-bold">
                           <span>Total:</span>
-                          <span className="text-indigo-600">KES {total.toFixed(2)}</span>
+                          <span className="text-indigo-600">{formatPrice(total)}</span>
                         </div>
                       </div>
 
@@ -444,7 +444,7 @@ export default function DesktopPOS() {
                   <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">KES {totalRevenue.toFixed(2)}</div>
+                  <div className="text-2xl font-bold">{formatPrice(totalRevenue)}</div>
                   <p className="text-xs text-gray-600">{transactionLogs.length} transactions</p>
                 </CardContent>
               </Card>
@@ -454,7 +454,7 @@ export default function DesktopPOS() {
                   <CardTitle className="text-sm font-medium">Avg Transaction</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">KES {avgTransaction.toFixed(2)}</div>
+                  <div className="text-2xl font-bold">{formatPrice(avgTransaction)}</div>
                   <p className="text-xs text-gray-600">Per sale</p>
                 </CardContent>
               </Card>
@@ -464,7 +464,7 @@ export default function DesktopPOS() {
                   <CardTitle className="text-sm font-medium">Cash Sales</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">KES {paymentBreakdown.cash.toFixed(2)}</div>
+                  <div className="text-2xl font-bold">{formatPrice(paymentBreakdown.cash)}</div>
                   <p className="text-xs text-gray-600">{((paymentBreakdown.cash / totalRevenue) * 100 || 0).toFixed(0)}% of total</p>
                 </CardContent>
               </Card>
@@ -474,7 +474,7 @@ export default function DesktopPOS() {
                   <CardTitle className="text-sm font-medium">M-Pesa Sales</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">KES {paymentBreakdown.mpesa.toFixed(2)}</div>
+                  <div className="text-2xl font-bold">{formatPrice(paymentBreakdown.mpesa)}</div>
                   <p className="text-xs text-gray-600">{((paymentBreakdown.mpesa / totalRevenue) * 100 || 0).toFixed(0)}% of total</p>
                 </CardContent>
               </Card>
@@ -484,7 +484,7 @@ export default function DesktopPOS() {
                   <CardTitle className="text-sm font-medium">Card Sales</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">KES {paymentBreakdown.card.toFixed(2)}</div>
+                  <div className="text-2xl font-bold">{formatPrice(paymentBreakdown.card)}</div>
                   <p className="text-xs text-gray-600">{((paymentBreakdown.card / totalRevenue) * 100 || 0).toFixed(0)}% of total</p>
                 </CardContent>
               </Card>
@@ -494,7 +494,7 @@ export default function DesktopPOS() {
                   <CardTitle className="text-sm font-medium">Credit Sales</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">KES {paymentBreakdown.credit.toFixed(2)}</div>
+                  <div className="text-2xl font-bold">{formatPrice(paymentBreakdown.credit)}</div>
                   <p className="text-xs text-gray-600">{((paymentBreakdown.credit / totalRevenue) * 100 || 0).toFixed(0)}% of total</p>
                 </CardContent>
               </Card>
@@ -520,7 +520,7 @@ export default function DesktopPOS() {
                           <p className="text-xs text-gray-600">{seller.quantity} units sold</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-sm">KES {seller.revenue.toFixed(2)}</p>
+                          <p className="font-bold text-sm">{formatPrice(seller.revenue)}</p>
                           <Badge variant="secondary" className="text-xs mt-1">#{idx + 1}</Badge>
                         </div>
                       </div>
@@ -555,7 +555,7 @@ export default function DesktopPOS() {
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="text-right">
-                              <p className="font-bold">KES {log.total.toFixed(2)}</p>
+                              <p className="font-bold">{formatPrice(log.total)}</p>
                               <p className="text-xs text-gray-600">{log.timestamp.toLocaleTimeString()}</p>
                             </div>
                             {expandedTransaction === log.id ? (
@@ -570,7 +570,7 @@ export default function DesktopPOS() {
                             {log.items?.map((item, idx) => (
                               <div key={idx} className="flex justify-between text-xs">
                                 <span>{item.quantity}x {item.name}</span>
-                                <span>KES {(item.price * item.quantity).toFixed(2)}</span>
+                                <span>{formatPrice(item.price * item.quantity)}</span>
                               </div>
                             ))}
                             {log.notes && (

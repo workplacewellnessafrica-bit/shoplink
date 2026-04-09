@@ -1,4 +1,5 @@
 import { trpc } from "@/lib/trpc";
+import { formatPrice } from "@shared/currency";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -86,13 +87,13 @@ function OrderDetailDialog({
               {data.items.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
                   <span>{item.productName} × {item.quantity}</span>
-                  <span className="font-medium">${parseFloat(item.subtotal).toFixed(2)}</span>
+                  <span className="font-medium">{formatPrice(parseFloat(item.subtotal))}</span>
                 </div>
               ))}
               <Separator />
               <div className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span className="text-primary">${parseFloat(data.order.totalAmount).toFixed(2)}</span>
+                <span className="text-primary">{formatPrice(parseFloat(data.order.totalAmount))}</span>
               </div>
             </div>
 
@@ -285,7 +286,7 @@ function OrderHistory({ customerId }: { customerId: number }) {
                   <p className="text-xs text-muted-foreground truncate max-w-xs">{order.deliveryAddress}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-bold text-primary">${parseFloat(order.totalAmount).toFixed(2)}</p>
+                  <p className="font-bold text-primary">{formatPrice(parseFloat(order.totalAmount))}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">View details →</p>
                 </div>
               </div>

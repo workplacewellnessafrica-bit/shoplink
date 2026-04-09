@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { formatPrice } from "@shared/currency";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -195,7 +196,7 @@ export default function MobilePOS() {
               <p className="text-sm text-gray-600">{business?.name}</p>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-bold text-indigo-600">KES {total.toFixed(2)}</div>
+              <div className="text-3xl font-bold text-indigo-600">{formatPrice(total)}</div>
               <p className="text-sm text-gray-600">{itemCount} items</p>
             </div>
           </div>
@@ -254,7 +255,7 @@ export default function MobilePOS() {
                       onClick={() => addToCart(product)}
                     >
                       <div className="text-sm font-semibold text-center line-clamp-2">{product.name}</div>
-                      <div className="text-indigo-600 font-bold">KES {product.price}</div>
+                       <div className="text-indigo-600 font-bold">{formatPrice(product.price)}</div>
                       {product.stock < 5 && (
                         <Badge variant="destructive" className="mt-1 text-xs">
                           Low Stock
@@ -284,7 +285,7 @@ export default function MobilePOS() {
                     disabled={product.stock === 0}
                   >
                     <div className="text-sm font-semibold text-center line-clamp-2">{product.name}</div>
-                    <div className="text-indigo-600 font-bold">KES {product.price}</div>
+                     <div className="text-indigo-600 font-bold">{formatPrice(product.price)}</div>
                     {product.stock === 0 ? (
                       <Badge variant="secondary" className="mt-1 text-xs">
                         Out of Stock
@@ -322,7 +323,7 @@ export default function MobilePOS() {
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <p className="font-semibold text-sm">{item.name}</p>
-                            <p className="text-xs text-gray-600">KES {item.price}</p>
+                            <p className="text-xs text-gray-600">{formatPrice(item.price)}</p>
                           </div>
                           <Button
                             variant="ghost"
@@ -351,7 +352,7 @@ export default function MobilePOS() {
                               <Plus className="h-3 w-3" />
                             </Button>
                           </div>
-                          <p className="font-bold text-sm">KES {(item.price * item.quantity).toFixed(2)}</p>
+                          <p className="font-bold text-sm">{formatPrice(item.price * item.quantity)}</p>
                         </div>
                       </div>
                     ))}
@@ -361,11 +362,11 @@ export default function MobilePOS() {
                   <div className="border-t pt-3 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Subtotal:</span>
-                      <span>KES {total.toFixed(2)}</span>
+                      <span>{formatPrice(total)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg">
                       <span>Total:</span>
-                      <span className="text-indigo-600">KES {total.toFixed(2)}</span>
+                      <span className="text-indigo-600">{formatPrice(total)}</span>
                     </div>
                   </div>
 

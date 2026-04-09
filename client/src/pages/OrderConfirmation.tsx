@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { formatPrice } from "@shared/currency";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, MessageCircle, Package, ShoppingBag } from "lucide-react";
 import { Link, useLocation } from "wouter";
@@ -58,7 +59,7 @@ export default function OrderConfirmation() {
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Total Amount</span>
-              <span className="font-bold text-primary text-base">${parseFloat(orderData.totalAmount).toFixed(2)}</span>
+              <span className="font-bold text-primary text-base">{formatPrice(parseFloat(orderData.totalAmount))}</span>
             </div>
           </CardContent>
         </Card>

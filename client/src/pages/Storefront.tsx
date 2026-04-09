@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { formatPrice } from "@shared/currency";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface CartItem {
@@ -130,7 +131,7 @@ function CartSidebar({
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">{item.name}</p>
-                  <p className="text-primary font-semibold text-sm">${item.price.toFixed(2)}</p>
+                  <p className="text-primary font-semibold text-sm">{formatPrice(item.price)}</p>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Button
@@ -167,7 +168,7 @@ function CartSidebar({
           <div className="p-4 border-t space-y-4">
             <div className="flex items-center justify-between font-semibold">
               <span>Total</span>
-              <span className="text-primary text-lg">${total.toFixed(2)}</span>
+              <span className="text-primary text-lg">{formatPrice(total)}</span>
             </div>
             <Button className="w-full" size="lg" onClick={() => setCheckoutOpen(true)}>
               <MessageCircle className="mr-2 h-4 w-4" />
@@ -189,13 +190,13 @@ function CartSidebar({
               {cart.map((i) => (
                 <div key={i.productId} className="flex justify-between text-sm">
                   <span>{i.name} × {i.quantity}</span>
-                  <span className="font-medium">${(i.price * i.quantity).toFixed(2)}</span>
+                  <span className="font-medium">{formatPrice(i.price * i.quantity)}</span>
                 </div>
               ))}
               <Separator className="my-1" />
               <div className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span className="text-primary">${total.toFixed(2)}</span>
+                <span className="text-primary">{formatPrice(total)}</span>
               </div>
             </div>
 
@@ -461,7 +462,7 @@ export default function Storefront({ params }: { params: { slug: string } }) {
                   </div>
                   <CardContent className="pt-3 pb-4">
                     <p className="font-medium text-sm leading-tight line-clamp-2 mb-1">{product.name}</p>
-                    <p className="text-primary font-bold">${parseFloat(product.price).toFixed(2)}</p>
+                    <p className="text-primary font-bold">{formatPrice(parseFloat(product.price))}</p>
                     <Button
                       size="sm"
                       className="w-full mt-2 h-8 text-xs"
@@ -500,7 +501,7 @@ export default function Storefront({ params }: { params: { slug: string } }) {
                   <p className="text-muted-foreground text-sm leading-relaxed">{selectedProduct.description}</p>
                 )}
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary">${parseFloat(selectedProduct.price).toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-primary">{formatPrice(parseFloat(selectedProduct.price))}</span>
                   <div className="flex items-center gap-2">
                     {selectedProduct.stock === 0 ? (
                       <Badge variant="secondary">Out of Stock</Badge>

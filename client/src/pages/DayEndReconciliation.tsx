@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatPrice } from "@shared/currency";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
