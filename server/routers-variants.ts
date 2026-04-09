@@ -1,9 +1,9 @@
-import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { productVariants } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { getDb } from "./db";
 import { storagePut } from "./storage";
+import { router, protectedProcedure } from "./_core/trpc";
 
 export const variantRouter = router({
   // List variants for a product
@@ -60,21 +60,21 @@ export const variantRouter = router({
       const result = await db.insert(productVariants).values({
         productId: input.productId,
         name: input.name,
-        sku: input.sku,
+        sku: input.sku || null,
         price: input.price,
         stock: input.stock,
-        size: input.size,
-        color: input.color,
-        quality: input.quality,
-        origin: input.origin,
-        materials: input.materials,
-        description: input.description,
-        imageUrl,
-        imageKey,
+        size: input.size || null,
+        color: input.color || null,
+        quality: input.quality || null,
+        origin: input.origin || null,
+        materials: input.materials || null,
+        description: input.description || null,
+        imageUrl: imageUrl || null,
+        imageKey: imageKey || null,
         order: 0,
-      });
+      } as any);
 
-      return result;
+      return { success: true };
     }),
 
   // Update variant

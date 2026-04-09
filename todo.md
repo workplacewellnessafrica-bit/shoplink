@@ -469,3 +469,8 @@
 - [ ] Test image gallery fullscreen
 - [ ] Test variant display in storefront
 - [ ] Verify all attributes save correctly
+
+
+## Bug Fixes
+
+- [x] Fix variant creation database error - constraint violation when adding variant with attributes
