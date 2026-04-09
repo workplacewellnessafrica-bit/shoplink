@@ -207,14 +207,15 @@ export default function Home() {
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="container text-center max-w-2xl mx-auto">
           <h2 className="text-3xl font-display font-bold mb-4">Ready to Take Control?</h2>
-          <p className="text-primary-foreground/80 mb-8">
+          <p className="text-primary-foreground/80 mb-2">
             Join businesses across the region managing sales, inventory, and cash flow seamlessly. Create your free storefront in minutes.
           </p>
-          <Button size="lg" variant="secondary" asChild>
-            <Link href="/admin">
-              <Store className="mr-2 h-4 w-4" />
-              Create Your Store — Free
-            </Link>
+          <p className="text-sm text-primary-foreground/70 mb-8">
+            ✨ 15 days free trial — no credit card required
+          </p>
+          <Button size="lg" variant="secondary" onClick={handleBusinessAccess}>
+            <Store className="mr-2 h-4 w-4" />
+            Create Your Store — Free
           </Button>
         </div>
       </section>
