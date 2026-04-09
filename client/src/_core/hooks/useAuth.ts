@@ -2,6 +2,8 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback, useEffect, useMemo } from "react";
+import { clearLastRoute } from "@/hooks/useRoutePersistence";
+import { clearAllTabPreferences } from "@/hooks/useTabPersistence";
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -38,6 +40,9 @@ export function useAuth(options?: UseAuthOptions) {
     } finally {
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
+      // Clear all persistence on logout
+      clearLastRoute();
+      clearAllTabPreferences();
     }
   }, [logoutMutation, utils]);
 

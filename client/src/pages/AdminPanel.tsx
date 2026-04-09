@@ -44,6 +44,7 @@ import { useRef, useState } from "react";
 import { Link } from "wouter";
 import IconImagePicker from "@/components/IconImagePicker";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { useTabPersistence } from "@/hooks/useTabPersistence";
 
 // ─── Image Upload Helper ───────────────────────────────────────────────────────
 function fileToBase64(file: File): Promise<string> {
@@ -487,6 +488,7 @@ export default function AdminPanel() {
   const { hasAccess } = useRoleAccess("admin");
   const [productDialogOpen, setProductDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const { activeTab, setActiveTab } = useTabPersistence("admin-panel", "products");
   const utils = trpc.useUtils();
 
   if (!hasAccess) {
@@ -680,7 +682,7 @@ export default function AdminPanel() {
         )}
 
         {/* Main Tabs */}
-        <Tabs defaultValue="products">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
             <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>

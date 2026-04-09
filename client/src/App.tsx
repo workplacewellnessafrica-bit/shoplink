@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { useRoutePersistence } from "./hooks/useRoutePersistence";
 import Home from "./pages/Home";
 import AdminPanel from "./pages/AdminPanel";
 import Storefront from "./pages/Storefront";
@@ -21,6 +22,9 @@ import DesktopPOS from "./pages/DesktopPOS";
 import BusinessSetup from "./pages/BusinessSetup";
 
 function Router() {
+  // Persist current route to localStorage
+  useRoutePersistence();
+
   return (
     <Switch>
       <Route path="/" component={Home} />
