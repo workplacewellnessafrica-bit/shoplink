@@ -40,10 +40,12 @@ export default function Home() {
             <Button variant="ghost" size="sm" asChild>
               <Link href="/tools">Tools</Link>
             </Button>
+            <Button size="sm" asChild>
+              <Link href="/business-setup">Create Business</Link>
+            </Button>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/settings">Settings</Link>
             </Button>
-
           </div>
         </div>
       </nav>

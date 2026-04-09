@@ -276,10 +276,12 @@
 
 ### Business Setup & Onboarding
 - [x] Fix business creation flow
+- [ ] Users logged in as customers cannot create business profiles
 - [ ] Add business setup wizard with step-by-step guidance
 - [ ] Implement feature selection (POS, Analytics, etc.)
 - [ ] Add business profile completion checklist
 - [ ] Validate required fields before allowing access to dashboard
+- [ ] Add way to switch between customer and business modes
 
 ### Password Management
 - [ ] Implement password recovery/reset feature
