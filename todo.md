@@ -507,3 +507,20 @@
 - [ ] Test notification delivery for orders
 - [ ] Verify field validation works correctly
 - [ ] Test WhatsApp CTA clarity on mobile
+
+
+## Phase 17: Bug Fixes & Sales Analytics
+
+### Variant Creation Error
+- [x] Debug variant creation database error from browser
+- [x] Check server logs for SQL error details
+- [x] Fix enum or data type mismatch in variant insertion
+- [x] Verify all field types match schema
+
+### Day Sales Analytics
+- [ ] Add sales breakdown by channel (POS vs Web sales)
+- [ ] Add POS sales breakdown by payment method (Credit, Card, Cash, M-Pesa)
+- [ ] Display day sales in admin portal analytics
+- [ ] Create sales summary card showing daily totals
+- [ ] Add charts for sales trends by channel
+- [ ] Test sales data aggregation
