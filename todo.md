@@ -355,3 +355,26 @@
 - [ ] Verify all notification channels work (Email, WhatsApp, SMS)
 - [ ] Check logs for notification delivery status
 - [ ] Test error handling and fallbacks
+
+
+## Phase 12: Business Signup and App Updates
+
+### New Business Signup Flow
+- [x] Fix OAuth callback to redirect new businesses to admin portal
+- [x] Verify business creation after OAuth completes
+- [x] Ensure redirect URL is correct for admin dashboard
+- [ ] Test complete signup flow end-to-end
+- [x] Add error handling for signup failures
+
+### Android App Updates
+- [ ] Update Android app with latest API endpoints
+- [ ] Ensure OAuth flow works on mobile
+- [ ] Test business signup on Android device
+- [ ] Update app version and build number
+- [ ] Publish updated Android app to Play Store
+
+### Desktop App Updates
+- [ ] Update Electron/Desktop app with latest endpoints
+- [ ] Test business signup on desktop
+- [ ] Update app version
+- [ ] Publish updated desktop app

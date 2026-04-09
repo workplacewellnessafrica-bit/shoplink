@@ -44,7 +44,15 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
-      res.redirect(302, "/");
+      // Get the user to check if they have a business
+      const user = await db.getUserByOpenId(userInfo.openId);
+      if (!user) throw new Error("User not found after upsert");
+      
+      const business = await db.getBusinessByUserId(user.id);
+      
+      // Redirect to business setup if user doesn't have a business yet
+      const redirectPath = business ? "/admin" : "/business-setup";
+      res.redirect(302, redirectPath);
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
       res.status(500).json({ error: "OAuth callback failed" });
