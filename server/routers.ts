@@ -36,7 +36,6 @@ import { nanoid } from "nanoid";
 import { otpRouter, attendantRouter, barcodeRouter, posRouter, reconciliationRouter } from "./routers-pos";
 import { broadcastInventoryUpdate } from "./_core/inventoryEvents";
 import { notifyBusinessOfNewOrder } from "./_core/businessNotifications";
-import { notifyBusinessOfNewOrder } from "./_core/businessNotifications";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function slugify(name: string): string {
@@ -351,21 +350,27 @@ const orderRouter = router({
 
       // Send automatic email and WhatsApp notifications to business owner
       const orderUrl = `${process.env.VITE_APP_URL || "http://localhost:3000"}/admin?orderId=${orderId}`;
-      notifyBusinessOfNewOrder({
-        orderId,
-        customerName: input.customerName,
-        customerPhone: input.customerPhone,
-        businessName: business.name,
-        businessEmail: business.email || undefined,
-        businessWhatsApp: business.whatsappNumber,
-        items: resolvedItems.map((i) => ({
-          name: i.productName,
-          quantity: i.quantity,
-          price: i.productPrice,
-        })),
-        total: totalAmount,
-        orderUrl,
-      }).catch((err) => console.error("[Order] Failed to notify business:", err));
+      // Send notifications synchronously before returning response
+      try {
+        await notifyBusinessOfNewOrder({
+          orderId,
+          customerName: input.customerName,
+          customerPhone: input.customerPhone,
+          businessName: business.name,
+          businessEmail: undefined, // Email notifications can be configured in business settings
+          businessWhatsApp: business.whatsappNumber,
+          items: resolvedItems.map((i) => ({
+            name: i.productName,
+            quantity: i.quantity,
+            price: i.productPrice,
+          })),
+          total: totalAmount,
+          orderUrl,
+        });
+      } catch (err) {
+        console.error("[Order] Failed to notify business:", err);
+        // Continue with order even if notification fails
+      }
 
       // Build WhatsApp message for customer
       if (business) {

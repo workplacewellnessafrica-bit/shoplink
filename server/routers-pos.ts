@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { sendWhatsAppOTP } from "./_core/whatsapp";
+import { notifyBusinessOfNewOrder } from "./_core/businessNotifications";
 import {
   createOtpVerification,
   getOtpVerification,
@@ -205,6 +206,27 @@ export const posRouter = router({
         // Broadcast inventory update to all connected clients
         broadcastInventoryUpdate(input.businessId, item.productId, previousStock - item.quantity, previousStock);
       }
+      // Send business owner notification immediately
+      try {
+        await notifyBusinessOfNewOrder({
+          orderId: transactionId,
+          customerName: "POS Sale",
+          customerPhone: input.paymentMethod.toUpperCase(),
+          businessName: business.name,
+          businessEmail: undefined,
+          businessWhatsApp: business.whatsappNumber,
+          items: input.items.map((item) => ({
+            name: `Product #${item.productId}`,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+          total: totalAmount,
+          orderUrl: `${process.env.VITE_APP_URL || "http://localhost:3000"}/admin?transactionId=${transactionId}`,
+        });
+      } catch (err) {
+        console.error("[POS] Failed to notify business of transaction:", err);
+      }
+
       // Send confirmation email (async, don't wait)
       const itemsForEmail = input.items.map((item) => ({ name: `Product #${item.productId}`, quantity: item.quantity, price: item.price }));
       sendOrderConfirmationEmail(
