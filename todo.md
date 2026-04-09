@@ -299,3 +299,25 @@
 - [x] Send order summary to business WhatsApp number
 - [ ] Add notification preferences in business settings
 - [ ] Track notification delivery status
+
+## Phase 10: Attendant Management & Mobile Layout
+
+### Attendant/Team Management UI
+- [x] Add "Team" tab to admin panel for managing attendants
+- [x] Build invite attendant form (email, name, role selection)
+- [x] Display list of invited/active attendants with roles
+- [x] Implement role selection dropdown (admin, accountant, sales person, cashier)
+- [ ] Add remove/edit attendant functionality
+- [x] Show attendant status (pending invite, active, inactive)
+- [ ] Create attendant invitation email template
+- [ ] Implement attendant acceptance flow (email link → create account)
+- [ ] Add role-based permissions display
+
+### Mobile Layout Improvements
+- [x] Fix Store Profile form layout on mobile (stack fields vertically)
+- [ ] Improve responsive design for admin panel tabs
+- [ ] Optimize product grid for small screens
+- [x] Fix cramped spacing in store profile fields
+- [ ] Test all admin pages on mobile viewport (375px width)
+- [ ] Ensure buttons and inputs are touch-friendly (min 44px height)
+- [ ] Improve form field spacing and labels on mobile

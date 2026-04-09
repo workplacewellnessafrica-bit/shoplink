@@ -36,6 +36,9 @@ import {
   Store,
   Trash2,
   Upload,
+  Users,
+  Mail,
+  X,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { Link } from "wouter";
@@ -213,6 +216,170 @@ function ProductForm({
   );
 }
 
+// ─── Team Management ─────────────────────────────────────────────────────────
+function TeamManagement({ businessId }: { businessId: number }) {
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"attendant" | "accountant" | "manager">("attendant");
+  const [inviteName, setInviteName] = useState("");
+  const utils = trpc.useUtils();
+
+  const { data: attendants, isLoading } = trpc.attendant.list.useQuery(undefined, {
+    enabled: !!businessId,
+  });
+
+  const createAttendant = trpc.attendant.create.useMutation({
+    onSuccess: () => {
+      toast.success("Attendant invited successfully!");
+      setInviteEmail("");
+      setInviteName("");
+      setInviteRole("attendant");
+      utils.attendant.list.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const updateAttendant = trpc.attendant.update.useMutation({
+    onSuccess: () => {
+      toast.success("Attendant updated!");
+      utils.attendant.list.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const handleInvite = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail || !inviteName) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    createAttendant.mutate({
+      name: inviteName,
+      email: inviteEmail,
+      role: inviteRole,
+    });
+  };
+
+  const roleLabels: Record<string, string> = {
+    attendant: "Sales Person",
+    accountant: "Accountant",
+    manager: "Manager",
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Invite Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Invite Team Member
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleInvite} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Name *</Label>
+                <Input
+                  value={inviteName}
+                  onChange={(e) => setInviteName(e.target.value)}
+                  placeholder="John Doe"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Email *</Label>
+                <Input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="john@example.com"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Role *</Label>
+              <Select value={inviteRole} onValueChange={(val) => setInviteRole(val as any)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="attendant">Sales Person</SelectItem>
+                  <SelectItem value="accountant">Accountant</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button type="submit" disabled={createAttendant.isPending} className="w-full">
+              {createAttendant.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send Invite
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* Attendants List */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Team Members ({attendants?.length ?? 0})</h3>
+        {isLoading ? (
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => <div key={i} className="h-16 bg-muted rounded-lg animate-pulse" />)}
+          </div>
+        ) : attendants?.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <p className="font-medium">No team members yet</p>
+            <p className="text-sm mt-1">Invite your first team member above</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {attendants?.map((att) => (
+              <Card key={att.id}>
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold">{att.name}</p>
+                        <Badge variant="secondary" className="text-xs">
+                          {roleLabels[att.role] || att.role}
+                        </Badge>
+                        {!att.isActive && <Badge variant="outline" className="text-xs">Inactive</Badge>}
+                      </div>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                        <Mail className="h-3 w-3" />
+                        {att.email}
+                      </p>
+                    </div>
+                    <Select
+                      value={att.role}
+                      onValueChange={(val) =>
+                        updateAttendant.mutate({
+                          id: att.id,
+                          role: val as any,
+                        })
+                      }
+                    >
+                      <SelectTrigger className="w-32 h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="attendant">Sales Person</SelectItem>
+                        <SelectItem value="accountant">Accountant</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Store Profile Editor ─────────────────────────────────────────────────────
 function StoreProfileEditor({ business }: { business: any }) {
   const [name, setName] = useState(business.name);
@@ -268,7 +435,7 @@ function StoreProfileEditor({ business }: { business: any }) {
         allowImageUpload={true}
       />
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="space-y-3">
           <Label className="text-sm font-medium">Logo</Label>
           <IconImagePicker
@@ -281,7 +448,7 @@ function StoreProfileEditor({ business }: { business: any }) {
             allowImageUpload={true}
           />
         </div>
-        <div className="space-y-3">
+        <div className="space-y-3 sm:col-span-2">
           <div className="space-y-1.5">
             <Label>Store Name *</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} required />
@@ -517,6 +684,7 @@ export default function AdminPanel() {
           <TabsList className="mb-6">
             <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="team">Team</TabsTrigger>
             <TabsTrigger value="store">Store Profile</TabsTrigger>
           </TabsList>
 
@@ -667,6 +835,11 @@ export default function AdminPanel() {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          {/* Team Tab */}
+          <TabsContent value="team">
+            <TeamManagement businessId={business.id} />
           </TabsContent>
 
           {/* Store Profile Tab */}
