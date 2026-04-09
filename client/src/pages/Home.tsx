@@ -17,10 +17,12 @@ import {
   MessageSquare,
   Wifi,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useBusinessAccess } from "@/hooks/useBusinessAccess";
 
 export default function Home() {
   const { data: businesses, isLoading } = trpc.business.getAll.useQuery();
+  const { handleBusinessAccess } = useBusinessAccess();
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,9 +41,6 @@ export default function Home() {
             </Button>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/tools">Tools</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link href="/business-setup">Create Business</Link>
             </Button>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/settings">Settings</Link>
@@ -231,7 +230,7 @@ export default function Home() {
             <span>· Multi-Business Commerce Platform</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/admin" className="hover:text-foreground transition-colors">For Businesses</Link>
+            <button onClick={handleBusinessAccess} className="hover:text-foreground transition-colors cursor-pointer">For Businesses</button>
             <Link href="/orders" className="hover:text-foreground transition-colors">Track Orders</Link>
           </div>
         </div>
