@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { sendWhatsAppOTP } from "./_core/whatsapp";
 import {
   createOtpVerification,
   getOtpVerification,
@@ -46,7 +47,12 @@ export const otpRouter = router({
         expiresAt,
         attempts: 0,
       });
-      return { success: true, otpCode };
+      // Send OTP via WhatsApp
+      const sent = await sendWhatsAppOTP(input.phone, otpCode);
+      if (!sent) {
+        console.warn(`[OTP] Failed to send OTP to ${input.phone} via WhatsApp`);
+      }
+      return { success: true, message: sent ? "OTP sent via WhatsApp" : "OTP generated (WhatsApp delivery failed - check phone number)" };
     }),
 
   verify: publicProcedure
