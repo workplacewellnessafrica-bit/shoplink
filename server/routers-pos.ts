@@ -32,6 +32,7 @@ import {
 } from "./db";
 import { nanoid } from "nanoid";
 import { sendOrderConfirmationEmail } from "./email";
+import { broadcastInventoryUpdate } from "./_core/inventoryEvents";
 
 // ─── OTP Router ───────────────────────────────────────────────────────────────
 export const otpRouter = router({
@@ -164,7 +165,11 @@ export const posRouter = router({
       }
       const transactionId = await createPosTransaction({ businessId: input.businessId, attendantId: input.attendantId, items: JSON.stringify(input.items), totalAmount, paymentMethod: input.paymentMethod, notes: input.notes });
       for (const item of input.items) {
+        const product = await getProductById(item.productId);
+        const previousStock = product?.stock ?? 0;
         await deductStock(item.productId, item.quantity);
+        // Broadcast inventory update to all connected clients
+        broadcastInventoryUpdate(input.businessId, item.productId, previousStock - item.quantity, previousStock);
       }
       // Send confirmation email (async, don't wait)
       const itemsForEmail = input.items.map((item) => ({ name: `Product #${item.productId}`, quantity: item.quantity, price: item.price }));

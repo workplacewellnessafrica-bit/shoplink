@@ -34,6 +34,7 @@ import {
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import { otpRouter, attendantRouter, barcodeRouter, posRouter, reconciliationRouter } from "./routers-pos";
+import { broadcastInventoryUpdate } from "./_core/inventoryEvents";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function slugify(name: string): string {
@@ -239,7 +240,12 @@ const productRouter = router({
         updateData.imageKey = key;
       }
 
+      const previousProduct = await getProductById(input.id);
       await updateProduct(input.id, updateData as any);
+      // Broadcast inventory update if stock changed
+      if (input.stock !== undefined && previousProduct && input.stock !== previousProduct.stock) {
+        broadcastInventoryUpdate(business.id, input.id, input.stock, previousProduct.stock);
+      }
     }),
 
   delete: protectedProcedure

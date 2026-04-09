@@ -6,18 +6,22 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { useInventorySubscription } from "@/hooks/useInventorySubscription";
 import {
-  ShoppingCart,
-  Plus,
-  Minus,
-  Trash2,
-  Send,
-  AlertCircle,
-  TrendingUp,
-  Clock,
-  DollarSign,
-} from "lucide-react";
+    ShoppingCart,
+    Plus,
+    Minus,
+    Trash2,
+    Send,
+    AlertCircle,
+    TrendingUp,
+    Clock,
+    DollarSign,
+    Wifi,
+    WifiOff,
+  } from "lucide-react";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 // Emoji categories for quick product access
 const PRODUCT_CATEGORIES = {
@@ -46,6 +50,7 @@ export default function MobilePOS() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "mpesa" | "card" | "credit">("cash");
   const [notes, setNotes] = useState("");
+  const [wsConnected, setWsConnected] = useState(false);
 
   const { data: business } = trpc.business.getMine.useQuery();
   const { data: products } = trpc.product.listMine.useQuery(undefined, {
@@ -64,6 +69,29 @@ export default function MobilePOS() {
     },
     onError: (e) => toast.error(e.message),
   });
+
+  // Subscribe to real-time inventory updates
+  const { isConnected } = useInventorySubscription({
+    businessId: business?.id || 0,
+    onUpdate: (event) => {
+      // Update cart items with new stock
+      setCart((prev) =>
+        prev.map((item) =>
+          item.id === event.productId
+            ? { ...item, stock: event.newStock }
+            : item
+        )
+      );
+      // Show toast for low stock
+      if (event.newStock < 5 && event.newStock > 0) {
+        toast.warning(`Low stock: Product #${event.productId} has ${event.newStock} items left`);
+      }
+    },
+  });
+
+  useEffect(() => {
+    setWsConnected(isConnected);
+  }, [isConnected]);
 
   if (!hasAccess) {
     return (

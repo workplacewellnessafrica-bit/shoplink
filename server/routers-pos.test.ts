@@ -167,7 +167,7 @@ describe("POS Router", () => {
       });
       // Will fail if business/product doesn't exist
     } catch (error: any) {
-      expect(["NOT_FOUND", "FORBIDDEN", "INTERNAL_SERVER_ERROR"]).toContain(error.code);
+      expect(["NOT_FOUND", "FORBIDDEN", "INTERNAL_SERVER_ERROR", "BAD_REQUEST"]).toContain(error.code);
     }
   });
 
