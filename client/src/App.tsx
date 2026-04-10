@@ -20,6 +20,7 @@ import Tools from "./pages/Tools";
 import MobilePOS from "./pages/MobilePOS";
 import DesktopPOS from "./pages/DesktopPOS";
 import BusinessSetup from "./pages/BusinessSetup";
+import { Downloads } from "./pages/Downloads";
 
 function Router() {
   // Persist current route to localStorage
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/mobile-pos" component={MobilePOS} />
       <Route path="/desktop-pos" component={DesktopPOS} />
       <Route path="/business-setup" component={BusinessSetup} />
+      <Route path="/downloads" component={Downloads} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

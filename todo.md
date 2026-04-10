@@ -563,3 +563,39 @@
 - [ ] Test mobile responsiveness
 - [ ] Test WhatsApp integration
 - [ ] Test email and SMS notifications
+
+
+## Phase 19: App Distribution & Downloads
+
+### App Download Infrastructure
+- [ ] Create apps directory structure for storing binaries
+- [ ] Set up S3 bucket for app file hosting
+- [ ] Create download API endpoints for app versions
+- [ ] Implement version checking for app updates
+- [ ] Add app release management system
+
+### Android App Distribution
+- [ ] Build Android APK for Mobile POS
+- [ ] Build Android APK for Customer app
+- [ ] Create Google Play Store listings
+- [ ] Set up app signing certificates
+- [ ] Configure auto-update mechanism
+- [ ] Add download link to website
+
+### Desktop App Distribution
+- [ ] Build Electron app for Windows
+- [ ] Build Electron app for macOS
+- [ ] Create installer for Windows (.exe)
+- [ ] Create installer for macOS (.dmg)
+- [ ] Set up code signing for desktop apps
+- [ ] Configure auto-update for desktop
+- [ ] Add download link to website
+
+### Download Page
+- [ ] Create dedicated downloads page
+- [ ] Add system requirements for each app
+- [ ] Add installation instructions
+- [ ] Add troubleshooting guide
+- [ ] Show latest app versions
+- [ ] Add release notes for each version
+- [ ] Include QR codes for mobile app downloads
