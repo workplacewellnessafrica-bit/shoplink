@@ -529,9 +529,9 @@
 ## Phase 18: Admin Controls & Team Management
 
 ### Day Sales Analytics
-- [ ] Create sales summary API endpoint with channel breakdown
-- [ ] Add sales breakdown by channel (POS vs Web)
-- [ ] Add POS sales breakdown by payment method (Credit, Card, Cash, M-Pesa)
+- [x] Create sales summary API endpoint with channel breakdown
+- [x] Add sales breakdown by channel (POS vs Web)
+- [x] Add POS sales breakdown by payment method (Credit, Card, Cash, M-Pesa)
 - [ ] Display day sales in admin dashboard
 - [ ] Add sales charts and graphs
 - [ ] Implement date range filtering
