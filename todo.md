@@ -524,3 +524,42 @@
 - [ ] Create sales summary card showing daily totals
 - [ ] Add charts for sales trends by channel
 - [ ] Test sales data aggregation
+
+
+## Phase 18: Admin Controls & Team Management
+
+### Day Sales Analytics
+- [ ] Create sales summary API endpoint with channel breakdown
+- [ ] Add sales breakdown by channel (POS vs Web)
+- [ ] Add POS sales breakdown by payment method (Credit, Card, Cash, M-Pesa)
+- [ ] Display day sales in admin dashboard
+- [ ] Add sales charts and graphs
+- [ ] Implement date range filtering
+
+### Attendant Access Control
+- [ ] Add feature permission system for attendants
+- [ ] Create role-based access control (admin, manager, sales, accountant, cashier)
+- [ ] Allow admin to enable/disable features per attendant
+- [ ] Show feature access matrix in admin panel
+- [ ] Restrict POS access based on permissions
+- [ ] Restrict dashboard access based on permissions
+
+### Credential Management
+- [ ] Generate login credentials for attendants
+- [ ] Create temporary password system
+- [ ] Allow password reset for attendants
+- [ ] Add credential expiration tracking
+- [ ] Create credential audit log
+- [ ] Allow admin to revoke credentials
+
+### Feature Testing
+- [ ] Test variant creation and editing
+- [ ] Test variant image gallery
+- [ ] Test product display with variants
+- [ ] Test POS system with variants
+- [ ] Test order creation and notifications
+- [ ] Test day sales analytics
+- [ ] Test attendant login and access control
+- [ ] Test mobile responsiveness
+- [ ] Test WhatsApp integration
+- [ ] Test email and SMS notifications
