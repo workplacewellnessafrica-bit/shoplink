@@ -84,7 +84,6 @@ export default function DayEndReconciliation() {
         cashAtHand: cashAtHand || "0",
         mpesaTotal: mpesaTotal || "0",
         cardTotal: cardTotal || "0",
-        credits: credits || "0",
         expenditures: expenditures || "0",
       });
 

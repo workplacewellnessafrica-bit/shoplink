@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { sendWhatsAppOTP } from "./_core/whatsapp";
@@ -36,8 +35,10 @@ import { sendOrderConfirmationEmail } from "./email";
 import { sendAttendantInviteEmail } from "./attendantInvite";
 import { broadcastInventoryUpdate } from "./_core/inventoryEvents";
 import { sendOTPViaSMS, isSMSAvailable } from "./_core/sms";
+import * as bcrypt from "bcryptjs";
+import { TRPCError } from "@trpc/server";
 
-// ─── OTP Router ───────────────────────────────────────────────────────────────
+// ─── OTP Router ───────────────────────────────────────────────────────────
 export const otpRouter = router({
   send: publicProcedure
     .input(z.object({ phone: z.string().min(7) }))
@@ -108,14 +109,14 @@ export const otpRouter = router({
     }),
 });
 
-// ─── Attendant Router ─────────────────────────────────────────────────────────
+// ─── Attendant Router ─────────────────────────────────────────────────────
 export const attendantRouter = router({
   create: protectedProcedure
     .input(z.object({ name: z.string().min(1).max(255), email: z.string().email().optional(), role: z.enum(["attendant", "accountant", "manager"]) }))
     .mutation(async ({ ctx, input }) => {
       const business = await getBusinessByUserId(ctx.user.id);
       if (!business) throw new TRPCError({ code: "NOT_FOUND", message: "Create a store first" });
-      const attendantId = await createAttendant({ businessId: business.id, name: input.name, email: input.email, role: input.role });
+      const attendantId = await createAttendant({ businessId: business.id, name: input.name, email: input.email || undefined, role: input.role });
       
       // Send invite email if email is provided
       if (input.email) {
@@ -146,9 +147,33 @@ export const attendantRouter = router({
       if (!attendant || attendant.businessId !== business.id) throw new TRPCError({ code: "FORBIDDEN" });
       await updateAttendant(input.id, { name: input.name, role: input.role, isActive: input.isActive });
     }),
+
+  generateCredentials: protectedProcedure
+    .input(z.object({ attendantId: z.number(), username: z.string().min(3).max(100), password: z.string().min(8), pin: z.string().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const business = await getBusinessByUserId(ctx.user.id);
+      if (!business) throw new TRPCError({ code: "NOT_FOUND" });
+      const attendant = await getAttendantById(input.attendantId);
+      if (!attendant || attendant.businessId !== business.id) throw new TRPCError({ code: "FORBIDDEN" });
+      
+      // Hash password
+      const passwordHash = await bcrypt.hash(input.password, 10);
+      
+      // Update attendant with credentials
+      await updateAttendant(input.attendantId, {
+        username: input.username,
+        passwordHash,
+        pin: input.pin || undefined,
+        credentialsStatus: "generated" as any,
+      });
+      
+      console.log(`[Attendant] Credentials generated for ${attendant.name}`);
+      
+      return { success: true, message: "Credentials generated successfully" };
+    }),
 });
 
-// ─── Barcode Router ───────────────────────────────────────────────────────────
+// ─── Barcode Router ───────────────────────────────────────────────────────
 export const barcodeRouter = router({
   generate: protectedProcedure
     .input(z.object({ productId: z.number() }))
@@ -158,8 +183,14 @@ export const barcodeRouter = router({
       const business = await getBusinessByUserId(ctx.user.id);
       if (!business || product.businessId !== business.id) throw new TRPCError({ code: "FORBIDDEN" });
       const barcodeValue = `${business.id}-${product.id}-${nanoid(8)}`;
-      await createProductBarcode({ productId: product.id, barcodeValue, barcodeImage: null });
-      return { barcodeValue };
+      const barcode = await createProductBarcode({ productId: input.productId, barcodeValue });
+      return barcode;
+    }),
+
+  getByValue: publicProcedure
+    .input(z.object({ barcodeValue: z.string() }))
+    .query(async ({ input }) => {
+      return getProductBarcodeByValue(input.barcodeValue);
     }),
 
   getByProduct: protectedProcedure
@@ -169,88 +200,84 @@ export const barcodeRouter = router({
       if (!product) throw new TRPCError({ code: "NOT_FOUND" });
       const business = await getBusinessByUserId(ctx.user.id);
       if (!business || product.businessId !== business.id) throw new TRPCError({ code: "FORBIDDEN" });
-      return getProductBarcodesByProduct(product.id);
+      return getProductBarcodesByProduct(input.productId);
     }),
 
   scan: publicProcedure
-    .input(z.object({ barcodeValue: z.string(), businessId: z.number() }))
+    .input(z.object({ barcodeValue: z.string() }))
     .query(async ({ input }) => {
       const barcode = await getProductBarcodeByValue(input.barcodeValue);
       if (!barcode) throw new TRPCError({ code: "NOT_FOUND", message: "Barcode not found" });
       const product = await getProductById(barcode.productId);
-      if (!product || product.businessId !== input.businessId) throw new TRPCError({ code: "FORBIDDEN" });
+      if (!product) throw new TRPCError({ code: "NOT_FOUND", message: "Product not found" });
       return product;
     }),
 });
 
-// ─── POS Router ───────────────────────────────────────────────────────────────
+// ─── POS Router ───────────────────────────────────────────────────────────
 export const posRouter = router({
   searchByCode: publicProcedure
     .input(z.object({ businessId: z.number(), productCode: z.string() }))
     .query(async ({ input }) => {
       const product = await getProductByCode(input.businessId, input.productCode);
-      if (!product) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!product || product.businessId !== input.businessId) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Product not found" });
+      }
       return product;
     }),
 
   getPopular: publicProcedure
     .input(z.object({ businessId: z.number() }))
     .query(async ({ input }) => {
-      return getPopularProductsByBusiness(input.businessId, 12);
+      return getPopularProductsByBusiness(input.businessId);
     }),
 
   checkout: publicProcedure
-    .input(z.object({ businessId: z.number(), attendantId: z.number().optional(), items: z.array(z.object({ productId: z.number(), quantity: z.number().int().min(1), price: z.string() })), paymentMethod: z.enum(["cash", "mpesa", "card", "credit"]), notes: z.string().optional() }))
+    .input(
+      z.object({
+        businessId: z.number(),
+        items: z.array(z.object({ productId: z.number(), quantity: z.number(), price: z.string() })),
+        totalAmount: z.string().optional(),
+        paymentMethod: z.enum(["cash", "mpesa", "card", "credit"]),
+        notes: z.string().optional(),
+      })
+    )
     .mutation(async ({ input }) => {
       const business = await getBusinessById(input.businessId);
-      if (!business) throw new TRPCError({ code: "NOT_FOUND" });
-      let totalAmount = "0";
-      for (const item of input.items) {
-        const product = await getProductById(item.productId);
-        if (!product || product.businessId !== input.businessId) throw new TRPCError({ code: "FORBIDDEN" });
-        if (product.stock < item.quantity) throw new TRPCError({ code: "BAD_REQUEST", message: `Insufficient stock for ${product.name}` });
-        totalAmount = (parseFloat(totalAmount) + parseFloat(item.price) * item.quantity).toString();
-      }
-      const transactionId = await createPosTransaction({ businessId: input.businessId, attendantId: input.attendantId, items: JSON.stringify(input.items), totalAmount, paymentMethod: input.paymentMethod, notes: input.notes });
-      for (const item of input.items) {
-        const product = await getProductById(item.productId);
-        const previousStock = product?.stock ?? 0;
-        await deductStock(item.productId, item.quantity);
-        // Broadcast inventory update to all connected clients
-        broadcastInventoryUpdate(input.businessId, item.productId, previousStock - item.quantity, previousStock);
-      }
-      // Send business owner notification immediately
-      try {
-        await notifyBusinessOfNewOrder({
-          orderId: transactionId,
-          customerName: "POS Sale",
-          customerPhone: input.paymentMethod.toUpperCase(),
-          businessName: business.name,
-          businessEmail: undefined,
-          businessWhatsApp: business.whatsappNumber,
-          items: input.items.map((item) => ({
-            name: `Product #${item.productId}`,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-          total: totalAmount,
-          orderUrl: `${process.env.VITE_APP_URL || "http://localhost:3000"}/admin?transactionId=${transactionId}`,
-        });
-      } catch (err) {
-        console.error("[POS] Failed to notify business of transaction:", err);
+      if (!business) throw new TRPCError({ code: "NOT_FOUND", message: "Business not found" });
+
+      // Calculate total if not provided
+      let totalAmount = input.totalAmount;
+      if (!totalAmount) {
+        totalAmount = input.items
+          .reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0)
+          .toString();
       }
 
-      // Send confirmation email (async, don't wait)
-      const itemsForEmail = input.items.map((item) => ({ name: `Product #${item.productId}`, quantity: item.quantity, price: item.price }));
-      sendOrderConfirmationEmail(
-        "customer@example.com",
-        "Valued Customer",
-        transactionId,
-        itemsForEmail,
-        totalAmount,
-        business.name || "ShopLink Store"
-      ).catch((err) => console.error("Failed to send POS confirmation email:", err));
-      return { transactionId, totalAmount };
+      // Deduct stock for each item
+      for (const item of input.items) {
+        await deductStock(item.productId, item.quantity);
+      }
+
+      // Create POS transaction
+      const transaction = await createPosTransaction({
+        businessId: input.businessId,
+        attendantId: 0, // Public checkout, no attendant
+        items: JSON.stringify(input.items),
+        totalAmount: totalAmount as any,
+        paymentMethod: input.paymentMethod,
+        notes: input.notes,
+      });
+
+      // Broadcast inventory update
+      for (const item of input.items) {
+        const product = await getProductById(item.productId);
+        if (product) {
+          await broadcastInventoryUpdate(input.businessId, item.productId, product.stock, product.stock + item.quantity);
+        }
+      }
+
+      return { id: transaction, totalAmount };
     }),
 
   getTransactions: protectedProcedure
@@ -258,39 +285,90 @@ export const posRouter = router({
     .query(async ({ ctx, input }) => {
       const business = await getBusinessByUserId(ctx.user.id);
       if (!business) return [];
-      return getPosTransactionsByBusiness(business.id, input.date);
+      return getPosTransactionsByBusiness(business.id);
     }),
 });
 
-// ─── Reconciliation Router ────────────────────────────────────────────────────
+// ─── Reconciliation Router ────────────────────────────────────────────────
 export const reconciliationRouter = router({
   getTodayOrCreate: protectedProcedure.query(async ({ ctx }) => {
     const business = await getBusinessByUserId(ctx.user.id);
-    if (!business) throw new TRPCError({ code: "NOT_FOUND" });
+    if (!business) throw new TRPCError({ code: "NOT_FOUND", message: "Create a store first" });
+
     const today = new Date().toISOString().split("T")[0];
     let reconciliation = await getDayEndReconciliation(business.id, today);
+
     if (!reconciliation) {
-      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-      const yesterdayReconciliation = await getDayEndReconciliation(business.id, yesterday);
-      const openingBalance = yesterdayReconciliation?.closingBalance ?? "0";
-      await createDayEndReconciliation({ businessId: business.id, date: today, openingBalance, daysSales: "0", expenditures: "0", closingBalance: openingBalance, status: "pending" });
+      const id = await createDayEndReconciliation({
+        businessId: business.id,
+        date: today,
+        openingBalance: "0" as any,
+        daysSales: "0" as any,
+        expenditures: "0" as any,
+        closingBalance: "0" as any,
+      });
       reconciliation = await getDayEndReconciliation(business.id, today);
     }
+
     return reconciliation;
   }),
 
-  update: protectedProcedure
-    .input(z.object({ id: z.number(), cashAtHand: z.string().optional(), mpesaTotal: z.string().optional(), cardTotal: z.string().optional(), credits: z.string().optional(), expenditures: z.string().optional() }))
+  create: protectedProcedure
+    .input(
+      z.object({
+        date: z.string(),
+        openingBalance: z.string(),
+        daysSales: z.string(),
+        expenditures: z.string(),
+        cashAtHand: z.string().optional(),
+        mpesaTotal: z.string().optional(),
+        cardTotal: z.string().optional(),
+        credits: z.string().optional(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const business = await getBusinessByUserId(ctx.user.id);
       if (!business) throw new TRPCError({ code: "NOT_FOUND" });
-      const today = new Date().toISOString().split("T")[0];
-      const reconciliation = await getDayEndReconciliation(business.id, today);
-      if (!reconciliation || reconciliation.id !== input.id) throw new TRPCError({ code: "FORBIDDEN" });
-      const daysSales = parseFloat(input.mpesaTotal ?? "0") + parseFloat(input.cardTotal ?? "0") + parseFloat(input.cashAtHand ?? "0");
-      const expenditures = parseFloat(input.expenditures ?? "0");
-      const closingBalance = (parseFloat(reconciliation.openingBalance) + daysSales - expenditures).toString();
-      await updateDayEndReconciliation(input.id, { cashAtHand: input.cashAtHand, mpesaTotal: input.mpesaTotal, cardTotal: input.cardTotal, credits: input.credits, expenditures: input.expenditures, daysSales: daysSales.toString(), closingBalance });
+
+      const closingBalance = (parseFloat(input.openingBalance) + parseFloat(input.daysSales) - parseFloat(input.expenditures)).toString();
+
+      const reconciliationId = await createDayEndReconciliation({
+        businessId: business.id,
+        date: input.date,
+        openingBalance: input.openingBalance as any,
+        daysSales: input.daysSales as any,
+        expenditures: input.expenditures as any,
+        closingBalance: closingBalance as any,
+        cashAtHand: input.cashAtHand ? (input.cashAtHand as any) : null,
+        mpesaTotal: input.mpesaTotal ? (input.mpesaTotal as any) : null,
+        cardTotal: input.cardTotal ? (input.cardTotal as any) : null,
+        credits: input.credits ? (input.credits as any) : null,
+      });
+
+      return reconciliationId;
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        cashAtHand: z.string().optional(),
+        mpesaTotal: z.string().optional(),
+        cardTotal: z.string().optional(),
+        expenditures: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const business = await getBusinessByUserId(ctx.user.id);
+      if (!business) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const updateData: Record<string, any> = {};
+      if (input.cashAtHand) updateData.cashAtHand = input.cashAtHand;
+      if (input.mpesaTotal) updateData.mpesaTotal = input.mpesaTotal;
+      if (input.cardTotal) updateData.cardTotal = input.cardTotal;
+      if (input.expenditures) updateData.expenditures = input.expenditures;
+
+      await updateDayEndReconciliation(input.id, updateData);
     }),
 
   verify: protectedProcedure
@@ -298,6 +376,7 @@ export const reconciliationRouter = router({
     .mutation(async ({ ctx, input }) => {
       const business = await getBusinessByUserId(ctx.user.id);
       if (!business) throw new TRPCError({ code: "NOT_FOUND" });
+
       await updateDayEndReconciliation(input.id, { status: "verified" });
       return { success: true };
     }),
@@ -307,8 +386,17 @@ export const reconciliationRouter = router({
     .mutation(async ({ ctx, input }) => {
       const business = await getBusinessByUserId(ctx.user.id);
       if (!business) throw new TRPCError({ code: "NOT_FOUND" });
+
       await updateDayEndReconciliation(input.id, { status: "closed" });
       return { success: true };
+    }),
+
+  get: protectedProcedure
+    .input(z.object({ date: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const business = await getBusinessByUserId(ctx.user.id);
+      if (!business) return null;
+      return getDayEndReconciliation(business.id, input.date);
     }),
 
   getHistory: protectedProcedure.query(async ({ ctx }) => {

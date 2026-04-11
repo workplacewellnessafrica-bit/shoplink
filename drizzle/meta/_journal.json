@@ -57,6 +57,13 @@
       "when": 1775757920157,
       "tag": "0007_optimal_hammerhead",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1775831485854,
+      "tag": "0008_opposite_ender_wiggin",
+      "breakpoints": true
     }
   ]
 }
