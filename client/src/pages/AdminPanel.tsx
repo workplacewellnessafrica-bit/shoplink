@@ -47,6 +47,7 @@ import { VariantEditor } from "@/components/VariantEditor";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { useTabPersistence } from "@/hooks/useTabPersistence";
 import { formatPrice } from "@shared/currency";
+import { DaySalesAnalytics } from "@/components/DaySalesAnalytics";
 
 // ─── Image Upload Helper ───────────────────────────────────────────────────────
 function fileToBase64(file: File): Promise<string> {
@@ -693,6 +694,7 @@ export default function AdminPanel() {
           <TabsList className="mb-6">
             <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
             <TabsTrigger value="store">Store Profile</TabsTrigger>
           </TabsList>
@@ -866,6 +868,11 @@ export default function AdminPanel() {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <DaySalesAnalytics />
           </TabsContent>
 
           {/* Team Tab */}
