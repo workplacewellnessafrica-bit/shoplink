@@ -219,108 +219,7 @@ function ProductForm({
   );
 }
 
-// // ─── Credential Generator ────────────────────────────────────────────────────
-function CredentialGenerator({ attendantId, attendantName, attendantEmail }: { attendantId: number; attendantName: string; attendantEmail?: string }) {
-  const [username, setUsername] = useState(`${attendantName.toLowerCase().replace(/\s+/g, '_')}_${Math.random().toString(36).substring(7)}`);
-  const [password, setPassword] = useState(generateSecurePassword());
-  const [pin, setPin] = useState(generatePIN());
-  const [showPassword, setShowPassword] = useState(false);
-  const utils = trpc.useUtils();
-  
-  const generateCredentials = trpc.attendant.generateCredentials.useMutation({
-    onSuccess: () => {
-      toast.success("Credentials generated and sent to attendant!");
-      utils.attendant.list.invalidate();
-    },
-    onError: (e) => toast.error(e.message),
-  });
 
-  function generateSecurePassword(): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let password = '';
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
-  }
-
-  function generatePIN(): string {
-    return Math.floor(1000 + Math.random() * 9000).toString();
-  }
-
-  const handleGenerate = () => {
-    if (!username || !password) {
-      toast.error("Username and password are required");
-      return;
-    }
-    generateCredentials.mutate({
-      attendantId,
-      username,
-      password,
-      pin: pin || undefined,
-    });
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label>Username *</Label>
-        <div className="flex gap-2">
-          <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="username" />
-          <Button variant="outline" size="sm" onClick={() => setUsername(`${attendantName.toLowerCase().replace(/\s+/g, '_')}_${Math.random().toString(36).substring(7)}`)}>
-            Regenerate
-          </Button>
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Password *</Label>
-        <div className="flex gap-2">
-          <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
-          <Button variant="outline" size="sm" onClick={() => setPassword(generateSecurePassword())}>
-            Regenerate
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setShowPassword(!showPassword)}>
-            {showPassword ? 'Hide' : 'Show'}
-          </Button>
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <Label>PIN (Optional)</Label>
-        <div className="flex gap-2">
-          <Input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="1234" maxLength={4} />
-          <Button variant="outline" size="sm" onClick={() => setPin(generatePIN())}>
-            Regenerate
-          </Button>
-        </div>
-      </div>
-
-      <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-800">
-        <p className="font-semibold mb-1">Share these credentials with {attendantName}:</p>
-        <ul className="space-y-1 font-mono text-xs">
-          <li>Username: <span className="font-bold">{username}</span></li>
-          <li>Password: <span className="font-bold">{showPassword ? password : '••••••••'}</span></li>
-          {pin && <li>PIN: <span className="font-bold">{pin}</span></li>}
-        </ul>
-      </div>
-
-      <div className="flex gap-2">
-        <Button variant="outline" className="flex-1" onClick={() => {
-          const text = `Username: ${username}\nPassword: ${password}${pin ? `\nPIN: ${pin}` : ''}`;
-          navigator.clipboard.writeText(text);
-          toast.success("Credentials copied to clipboard");
-        }}>
-          Copy Credentials
-        </Button>
-        <Button className="flex-1" onClick={handleGenerate} disabled={generateCredentials.isPending}>
-          {generateCredentials.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Save & Send Email
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 // ─── Team Management ─────────────────────────────────────────────────────
 function TeamManagement({ businessId }: { businessId: number }) {
@@ -450,17 +349,7 @@ function TeamManagement({ businessId }: { businessId: number }) {
                         <Badge variant="secondary" className="text-xs">
                           {roleLabels[att.role] || att.role}
                         </Badge>
-                        {att.credentialsStatus && (
-                          <Badge className={`text-xs ${
-                            att.credentialsStatus === 'pending' ? 'bg-amber-100 text-amber-800' :
-                            att.credentialsStatus === 'generated' ? 'bg-blue-100 text-blue-800' :
-                            'bg-green-100 text-green-800'
-                          }`}>
-                            {att.credentialsStatus === 'pending' ? 'Credentials Pending' :
-                             att.credentialsStatus === 'generated' ? 'Credentials Ready' :
-                             'Credentials Accepted'}
-                          </Badge>
-                        )}
+                        <Badge className="text-xs bg-green-100 text-green-800">Active</Badge>
                         {!att.isActive && <Badge variant="outline" className="text-xs">Inactive</Badge>}
                       </div>
                       <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
@@ -486,21 +375,7 @@ function TeamManagement({ businessId }: { businessId: number }) {
                         <SelectItem value="manager">Manager</SelectItem>
                       </SelectContent>
                     </Select>
-                    {att.credentialsStatus === 'pending' && (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="h-8 text-xs">
-                            Generate Credentials
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Generate Login Credentials</DialogTitle>
-                          </DialogHeader>
-                          <CredentialGenerator attendantId={att.id} attendantName={att.name} attendantEmail={att.email || undefined} />
-                        </DialogContent>
-                      </Dialog>
-                    )}
+
                   </div>
                 </CardContent>
               </Card>

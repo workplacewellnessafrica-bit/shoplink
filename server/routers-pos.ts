@@ -148,29 +148,7 @@ export const attendantRouter = router({
       await updateAttendant(input.id, { name: input.name, role: input.role, isActive: input.isActive });
     }),
 
-  generateCredentials: protectedProcedure
-    .input(z.object({ attendantId: z.number(), username: z.string().min(3).max(100), password: z.string().min(8), pin: z.string().optional() }))
-    .mutation(async ({ ctx, input }) => {
-      const business = await getBusinessByUserId(ctx.user.id);
-      if (!business) throw new TRPCError({ code: "NOT_FOUND" });
-      const attendant = await getAttendantById(input.attendantId);
-      if (!attendant || attendant.businessId !== business.id) throw new TRPCError({ code: "FORBIDDEN" });
-      
-      // Hash password
-      const passwordHash = await bcrypt.hash(input.password, 10);
-      
-      // Update attendant with credentials
-      await updateAttendant(input.attendantId, {
-        username: input.username,
-        passwordHash,
-        pin: input.pin || undefined,
-        credentialsStatus: "generated" as any,
-      });
-      
-      console.log(`[Attendant] Credentials generated for ${attendant.name}`);
-      
-      return { success: true, message: "Credentials generated successfully" };
-    }),
+
 });
 
 // ─── Barcode Router ───────────────────────────────────────────────────────
