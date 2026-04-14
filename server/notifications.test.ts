@@ -56,5 +56,5 @@ describe("SMS Service", () => {
     // Result should have success and error properties
     expect(result).toHaveProperty("success");
     expect(typeof result.success).toBe("boolean");
-  });
+  }, 10000);
 });

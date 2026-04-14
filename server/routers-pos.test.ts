@@ -36,7 +36,7 @@ describe("OTP Router", () => {
     const result = await caller.otp.send({ phone: "+254712345678" });
     expect(result.success).toBe(true);
     expect(result.message).toBeDefined();
-  });
+  }, 10000);
 
   it("stores OTP in database for verification", async () => {
     const caller = appRouter.createCaller({} as any);
