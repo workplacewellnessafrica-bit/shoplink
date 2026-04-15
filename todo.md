@@ -603,3 +603,47 @@
 - [x] Show latest app versions
 - [x] Add release notes for each version
 - [x] Include QR codes for mobile app downloads
+
+
+## Deployment Polish
+
+### Critical UX Fixes
+- [x] Fix variant creation form 500 error handling
+- [x] Add proper error messages for failed API calls
+- [ ] Implement retry logic for failed requests
+- [ ] Add loading indicators for all async operations
+- [ ] Fix form validation error display
+
+### Performance Optimization
+- [x] Optimize bundle size (check Vite build output)
+- [x] Implement code splitting for large pages (lazy loading with Suspense)
+- [ ] Add image lazy loading
+- [x] Optimize database queries (add indexes where needed)
+- [x] Implement caching for frequently accessed data (via tRPC)
+
+### Security Hardening
+- [x] Add CSRF protection (via tRPC)
+- [x] Validate all user inputs on backend (via Zod schemas)
+- [ ] Implement rate limiting for API endpoints
+- [x] Add security headers (X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy)
+- [x] Sanitize user-generated content (via database and API validation)
+
+### Testing & QA
+- [ ] Test all critical user flows (signup, login, order, payment)
+- [ ] Test on mobile devices (iOS Safari, Android Chrome)
+- [ ] Test with slow network (3G simulation)
+- [ ] Test with large data sets (100+ products, 1000+ orders)
+- [ ] Test error scenarios (network failure, timeout, invalid input)
+
+### Production Configuration
+- [ ] Set up environment variables for production
+- [ ] Configure database backups
+- [ ] Set up error logging and monitoring
+- [ ] Configure CDN for static assets
+- [ ] Set up SSL/TLS certificates
+
+### Documentation
+- [ ] Create deployment guide
+- [ ] Document API endpoints
+- [ ] Create user guide for business owners
+- [ ] Create troubleshooting guide

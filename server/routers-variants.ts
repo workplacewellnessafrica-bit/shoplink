@@ -40,44 +40,54 @@ export const variantRouter = router({
       })
     )
     .mutation(async ({ input }: any) => {
-      const db = await getDb();
-      if (!db) throw new Error("Database connection failed");
-      let imageUrl: string | undefined;
-      let imageKey: string | undefined;
+      try {
+        const db = await getDb();
+        if (!db) throw new Error("Database connection failed");
+        let imageUrl: string | undefined;
+        let imageKey: string | undefined;
 
-      if (input.imageBase64 && input.imageMimeType) {
-        const buffer = Buffer.from(input.imageBase64, "base64");
-        const fileName = `variant-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-        const result = await storagePut(
-          `products/variants/${fileName}`,
-          buffer,
-          input.imageMimeType
-        );
-        imageUrl = result.url;
-        imageKey = result.key;
+        if (input.imageBase64 && input.imageMimeType) {
+          try {
+            const buffer = Buffer.from(input.imageBase64, "base64");
+            const fileName = `variant-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+            const result = await storagePut(
+              `products/variants/${fileName}`,
+              buffer,
+              input.imageMimeType
+            );
+            imageUrl = result.url;
+            imageKey = result.key;
+          } catch (imageError) {
+            console.error("Image upload failed:", imageError);
+            throw new Error("Failed to upload variant image");
+          }
+        }
+
+        const priceDecimal = parseFloat(input.price).toFixed(2);
+        
+        const result = await db.insert(productVariants).values({
+          productId: input.productId,
+          name: input.name,
+          sku: input.sku || null,
+          price: priceDecimal as any,
+          stock: parseInt(input.stock.toString()),
+          size: input.size || null,
+          color: input.color || null,
+          quality: input.quality || null,
+          origin: input.origin || null,
+          materials: input.materials || null,
+          description: input.description || null,
+          imageUrl: imageUrl || null,
+          imageKey: imageKey || null,
+          order: 0,
+          isActive: true,
+        } as any);
+
+        return { success: true };
+      } catch (error) {
+        console.error("Variant creation error:", error);
+        throw error;
       }
-
-      const priceDecimal = parseFloat(input.price).toFixed(2);
-      
-      const result = await db.insert(productVariants).values({
-        productId: input.productId,
-        name: input.name,
-        sku: input.sku || null,
-        price: priceDecimal as any,
-        stock: parseInt(input.stock.toString()),
-        size: input.size || null,
-        color: input.color || null,
-        quality: input.quality || null,
-        origin: input.origin || null,
-        materials: input.materials || null,
-        description: input.description || null,
-        imageUrl: imageUrl || null,
-        imageKey: imageKey || null,
-        order: 0,
-        isActive: true,
-      } as any);
-
-      return { success: true };
     }),
 
   // Update variant
